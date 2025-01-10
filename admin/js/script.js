@@ -1,3 +1,7 @@
+if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+}
+
 function adminLoginValidation(){
     document.getElementById("adminUserNameError").innerHTML=""
     document.getElementById("adminPasswordError").innerHTML=""
@@ -24,6 +28,39 @@ function logout(){
                 if(result){
                     location.reload();
                 }
+            }
+        })
+    }
+}
+
+function addCategory() {
+    document.getElementById("staticBackdropLabel").innerHTML="ADD CATEGORY";
+    document.getElementById("categoryNameField").value="";
+    document.getElementById("modalSubmit").name="createCategory";
+}
+
+function autoPopulateCategory(editCategoryId) {
+    document.getElementById("staticBackdropLabel").innerHTML="EDIT CATEGORY";
+    document.getElementById("modalSubmit").name="editCategory";
+    document.getElementById("categoryIdField").value=editCategoryId.value;
+    $.ajax({
+        type:"POST",
+        url:"./Components/adminComponent.cfc?method=autoPopulateCategory",
+        data:{editCategoryId:editCategoryId.value},
+        success: function(result) {
+            document.getElementById("categoryNameField").value=result;
+        }
+    });
+}
+
+function deleteCategory(deleteCategoryId) {
+    if (confirm("Delete category?")) {
+        $.ajax({
+            type:"post",
+            url:"components/adminComponent.cfc?method=deleteCategory",
+            data:{deleteCategoryId:deleteCategoryId.value},
+            success:function(){
+                    document.getElementById(deleteCategoryId.value).remove()
             }
         })
     }
