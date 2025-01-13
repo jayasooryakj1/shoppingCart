@@ -2,6 +2,7 @@ if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
 
+// ADMIN LOGIN
 function adminLoginValidation(){
     document.getElementById("adminUserNameError").innerHTML=""
     document.getElementById("adminPasswordError").innerHTML=""
@@ -19,6 +20,7 @@ function adminLoginValidation(){
     }
 }
 
+// ADMIN LOGOUT
 function logout(){
     if(confirm("Logout?")){
         $.ajax({
@@ -33,12 +35,15 @@ function logout(){
     }
 }
 
+// CATEGORY
+// ADD CATEGORY
 function addCategory() {
     document.getElementById("staticBackdropLabel").innerHTML="ADD CATEGORY";
     document.getElementById("categoryNameField").value="";
     document.getElementById("modalSubmit").name="createCategory";
 }
 
+// AUTO POPULATE CATEGORY
 function autoPopulateCategory(editCategoryId) {
     document.getElementById("staticBackdropLabel").innerHTML="EDIT CATEGORY";
     document.getElementById("modalSubmit").name="editCategory";
@@ -53,6 +58,7 @@ function autoPopulateCategory(editCategoryId) {
     });
 }
 
+// DELETE CATEGORY
 function deleteCategory(deleteCategoryId) {
     if (confirm("Delete category?")) {
         $.ajax({
@@ -65,3 +71,43 @@ function deleteCategory(deleteCategoryId) {
         })
     }
 }
+
+// SUB CATEGORY
+// ADD SUB CATEGORY
+function addSubCategory(subCategoryStuct) {
+    document.getElementById("categorySelect").value=subCategoryStuct.categoryId;
+    document.getElementById("staticBackdropLabel").innerHTML="ADD SUB CATEGORY";
+    document.getElementById("subCategoryNameField").value="";
+    document.getElementById("subCategorySubmit").value=0;
+}
+
+// AUTO POPULATE SUB CATEGORY
+function autoPopulateSubCategory(subCategoryStruct) {
+    document.getElementById("categorySelect").value=subCategoryStruct.categoryId;
+    document.getElementById("subCategoryNameField").value=subCategoryStruct.subCategoryName;
+    document.getElementById("modalSubmit").value=1;
+    document.getElementById("subCategoryIdField").value=subCategoryStruct.subCategoryId;
+}
+
+// DELETE SUB CATEGORY
+function deleteSubCategory(deleteSubCategoryId) {
+    if (confirm("Delete sub category?")) {
+        $.ajax({
+            type:"post",
+            url:"components/adminComponent.cfc?method=deleteSubCategory",
+            data:{deleteSubCategoryId:deleteSubCategoryId.value},
+            success:function(){
+                    document.getElementById(deleteSubCategoryId.value).remove()
+            }
+        })
+    }
+}
+
+// PRODUCT
+// ADD PRODUCT
+function addProduct(productStruct) {
+    document.getElementById("staticBackdropLabel").innerHTML="ADD PRODUCT";
+    document.getElementById("productSubmit").value=1;
+}
+
+// 

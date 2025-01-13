@@ -1,20 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/adminStyle.css">
-        <link rel="stylesheet" href="../css/bootstrap-5.0.2-dist/bootstrap-5.0.2-dist/css/bootstrap.min.css">
-        <title>Admin Dashboard</title>
-    </head>
-    <body>
-
+<cfinclude  template="./adminHeader.cfm">
         <cfset categoryObject = createObject("component", "components.adminComponent")>
-
-        <!---<div class="d-flex adminHeader p-3">
-            <div>Admin Dashboard</div>
-            <div class="logout"><button class="btn logoutButton" onclick="logout()">LOGOUT</button></div>
-        </div>--->
         <div class="d-flex flex-column align-items-center justify-content-center mt-5">
             <div>
 
@@ -60,7 +45,7 @@
                             <td class="d-flex justify-content-center align-items-center w-75 py-3">#categoriesDisplay.fldCategoryName#</td>
                             <td><button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#categoriesDisplay.fldCategory_ID#" onclick="autoPopulateCategory(this)">Edit</button></td>
                             <td><button class="btn btn-danger me-2" value="#categoriesDisplay.fldCategory_ID#" onclick="deleteCategory(this)">Delete</button></td>
-                            <td><a href="subCategoryPage.cfm" class="btn btn-success me-2" value="#categoriesDisplay.fldCategory_ID#">View</a></td>
+                            <td><a href="subCategoryPage.cfm?categoryId=#categoriesDisplay.fldCategory_ID#&categoryName=#categoriesDisplay.fldCategoryName#" class="btn btn-success me-2" value="#categoriesDisplay.fldCategory_ID#">View</a></td>
                         </tr>
                     </cfloop>
                 </cfoutput>
@@ -89,9 +74,4 @@
                 </div>
             </div>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="../js/jquery-3.7.1.js"></script>
-        <script src="./js/script.js"></script>
-    </body>
-</html>
+    <cfinclude  template="./footer.cfm">
