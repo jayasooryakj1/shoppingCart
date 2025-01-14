@@ -28,6 +28,6 @@
     border: 1px solid white;
 }
 
-.categoryName, .subCategoryName{
+.categoryName, .subCategoryName, .productName{
     padding-left: 120px;
 }

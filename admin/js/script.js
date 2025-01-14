@@ -103,11 +103,110 @@ function deleteSubCategory(deleteSubCategoryId) {
     }
 }
 
+// CLEAR FROM
+function clearFom() {
+    form.reset();
+}
+
 // PRODUCT
 // ADD PRODUCT
 function addProduct(productStruct) {
     document.getElementById("staticBackdropLabel").innerHTML="ADD PRODUCT";
     document.getElementById("productSubmit").value=1;
+    document.getElementById("categorySelect").value=productStruct.categoryId;
+    document.getElementById("subCategorySelect").value=productStruct.subCategoryId;
+    document.getElementById("brandSelect").value="";
+    document.getElementById("modalProductDescription").value="";
+    document.getElementById("modalProductPrice").value="";
+    document.getElementById("modalProductTax").value="";
 }
 
 // 
+function dropDownChange() {
+    var categoryId = document.getElementById("categorySelect").value;
+    var subCategorySelect = document.getElementById("subCategorySelect");
+    $.ajax({
+        type:"GET",
+        url:"components/adminComponent.cfc?method=autoPopulateSubCategoryModal",
+        data:{categoryId : categoryId},
+        success:function(result){
+            if(result)
+            {
+                subCategoryDetails=JSON.parse(result)
+                while (subCategorySelect.options.length) {
+                    subCategorySelect.remove(0);
+                }
+                for (var key in subCategoryDetails) {
+                    if (subCategoryDetails.hasOwnProperty(key)) {
+                      var option = document.createElement('option');
+                      option.value = key; 
+                      option.textContent = subCategoryDetails[key];
+                      subCategorySelect.appendChild(option);
+                    }
+                }
+            }else{
+                alert("Error")
+            }
+        }
+    });
+}
+
+// DELETE PRODUCT
+function deleteProduct(deleteProductId) {
+    if (confirm("Delete product?")) {
+        $.ajax({
+            type:"post",
+            url:"components/adminComponent.cfc?method=deleteProduct",
+            data:{deleteProductId:deleteProductId.value},
+            success:function(){
+                    document.getElementById(deleteProductId.value).remove()
+            }
+        })
+    }
+}
+
+// EDIT PRODUCT AUTO POPULATE
+function autoPopulateProduct(productStruct) {
+    document.getElementById("staticBackdropLabel").innerHTML="EDIT PRODUCT";
+    document.getElementById("categorySelect").value=productStruct.categoryId;
+    document.getElementById("subCategorySelect").value=productStruct.subCategoryId;
+    document.getElementById("modalProductName").value=productStruct.productName;
+    document.getElementById("brandSelect").value=productStruct.productBrand;
+    document.getElementById("modalProductDescription").value=productStruct.productDescription;
+    document.getElementById("modalProductPrice").value=productStruct.productPrice;
+    document.getElementById("modalProductTax").value=productStruct.productTax;
+    document.getElementById("modalProductId").value=productStruct.productId;
+    document.getElementById("productSubmit").value=0;
+    document.getElementById("modalProductImages").removeAttribute("required");
+}
+
+// AUTO POPULATE EDIT IMAGE
+function editImage(productStruct) {
+    var editProductId = productStruct.productId;
+    $.ajax({
+        type:"post",
+        url:"components/adminComponent.cfc?method=editProductImageAutoPopulate",
+        data:{editProductId:editProductId},
+        success:function(result){
+            productImages=JSON.parse(result)
+            var active = 1;
+            for (var key in productImages) {
+                if (productImages.hasOwnProperty(key)) {
+                    var sliderBody = document.createElement('div');
+                    var sliderImage = document.createElement('img');
+                    sliderBody.value = key;
+                    if (active == 1) {
+                        sliderBody.classList.add("active");
+                        active=0;
+                    }
+                    sliderBody.classList.add("carousel-item");
+                    sliderImage.src="../assets/productimages/"+productImages[key];
+                    sliderImage.width=350;
+                    sliderBody.appendChild(sliderImage)
+                    console.log(sliderBody)
+                    document.getElementById("carousel-inner").appendChild(sliderBody)
+                }
+            }
+        }
+    })
+}

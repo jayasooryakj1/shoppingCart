@@ -261,8 +261,41 @@
     </cffunction>
 
     <!--- PRODUCTS --->
+    <!--- DISPLAY PRODUCT --->
+    <cffunction  name="displayProduct">
+        <cfargument  name="subCategoryId">
+        <cfquery name="local.displayProduct">
+            SELECT 
+                fldProduct_ID,
+                fldProductName,
+                fldSubCategoryId,
+                fldPrice,
+                fldTax,
+                fldBrandName,
+                fldBrandId,
+                fldDescription,
+                fldImageFileName
+            FROM
+                tblProduct
+            LEFT JOIN 
+                tblBrands
+            ON
+                tblProduct.fldBrandId = tblBrands.fldBrand_ID
+            LEFT JOIN
+                tblProductImages
+            ON
+                tblProduct.fldProduct_ID = tblProductImages.fldProductId
+                AND tblProductImages.fldDefaultImage = 1
+            WHERE
+                tblProduct.fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">
+                AND tblProduct.fldActive = 1
+        </cfquery>
+        <cfreturn local.displayProduct>
+    </cffunction>
+
     <!--- AUTO POPULATE SUB CATEGORY NAME --->
-    <cffunction  name="autoPopulateSubCategoryModal">
+    <cffunction  name="autoPopulateSubCategoryModal" access="remote" returnformat="JSON">
+        <cfargument  name="categoryId">
         <cfquery name="local.autoPopulateSubCategory">
             SELECT
                 fldSubCategory_ID,
@@ -271,14 +304,33 @@
                 tblSubCategory
             WHERE
                 fldActive= 1
+                AND fldCategoryId = <cfqueryparam value="#arguments.categoryId#" cfsqltype="NUMERIC">
         </cfquery>
-        <cfreturn local.autoPopulateSubCategory>
+        <cfloop query="local.autoPopulateSubCategory">
+            <cfset local.returnStruct[local.autoPopulateSubCategory.fldSubCategory_ID] = local.autoPopulateSubCategory.fldSubCategoryName>
+        </cfloop>
+        <cfreturn local.returnStruct>
+    </cffunction>
+
+    <!--- AUTO POPULATE BRAND --->
+    <cffunction  name="autoPopulateBrand">
+        <cfquery name="local.autoPopulateBrand">
+            SELECT
+                fldBrand_ID,
+                fldBrandName
+            FROM
+                tblBrands
+            WHERE
+                fldActive = 1
+        </cfquery>
+        <cfreturn local.autoPopulateBrand>
     </cffunction>
 
     <!--- CHECK IF PRODUCT EXISTS --->
     <cffunction  name="checkProductExistence">
         <cfargument  name="subCategoryId">
         <cfargument  name="productName">
+        <cfargument  name="productId">
         <cfquery name="local.productExistence">
             SELECT
                 fldProductName
@@ -287,6 +339,10 @@
             WHERE
                 fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">
                 AND fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">
+                AND fldActive = 1
+                <cfif structKeyExists(arguments, "productId")>
+                    AND NOT fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
+                </cfif>
         </cfquery>
         <cfif queryRecordCount(local.productExistence)>
             <cfreturn true>
@@ -297,23 +353,29 @@
 
     <!--- ADD PRODUCT --->
     <cffunction  name="addProduct">
-        <cfargument  name="subCatgeoryId">
+        <cfargument  name="subCategoryId">
         <cfargument  name="productName">
-        <cfargument  name="brandName">
+        <cfargument  name="brandId">
         <cfargument  name="productDescription">
         <cfargument  name="productPrice">
         <cfargument  name="productTax">
         <cfargument  name="productImages">
         <cfset local.productExistence = checkProductExistence(
-            subCategoryId = arguments.subCatgeoryId,
+            subCategoryId = arguments.subCategoryId,
             productName = arguments.productName
         )>
         <cfif NOT local.productExistence>
-            <cfquery name="addProduct">
+            <cffile  action="uploadall"
+                destination=#expandPath("../assets/productImages")#
+                result="local.uploadedFiles"
+                nameconflict="makeunique"
+            >
+            <cfquery result="local.addProduct">
                 INSERT INTO
                     tblProduct (
                         fldSubCategoryId,
                         fldProductName,
+                        fldBrandId,
                         fldDescription,
                         fldPrice,
                         fldTax,
@@ -322,14 +384,123 @@
                 VALUES (
                     <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
+                    <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#arguments.productDescription#" cfsqltype="VARCHAR">,
                     <cfqueryparam value="#arguments.productPrice#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#arguments.productTax#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
                 )
             </cfquery>
+            <cfset local.defaultImage = 1>
+            <cfloop array="#local.uploadedFiles#" item="item">
+                <cfquery name="local.insertImages">
+                    INSERT INTO
+                        tblProductImages (
+                            fldProductId,
+                            fldImageFileName,
+                            fldDefaultImage,
+                            fldCreatedBy
+                        )
+                    VALUES (
+                        <cfqueryparam value="#local.addProduct.generatedKey#" cfsqltype="NUMERIC">,
+                        <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
+                        <cfqueryparam value="#local.defaultImage#" cfsqltype="NUMERIC">,
+                        <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                    )
+                </cfquery>
+                <cfset local.defaultImage = 0>
+            </cfloop>
         </cfif>
         <cfreturn local.productExistence>
+    </cffunction>
+
+    <!--- DELETE PRODUCT --->
+    <cffunction  name="deleteProduct" access="remote">
+        <cfargument  name="deleteProductId">
+        <cfquery name="local.deleteProduct">
+            UPDATE
+                tblProduct
+            SET
+                fldActive = 0,
+                fldUpdatedBy = <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+            WHERE
+                fldProduct_ID = <cfqueryparam value="#arguments.deleteProductId#" cfsqltype="NUMERIC">
+        </cfquery>
+    </cffunction>
+
+    <!--- EDIT PRODUCT --->
+    <cffunction  name="editProduct">
+        <cfargument  name="subCategoryId">
+        <cfargument  name="productName">
+        <cfargument  name="brandId">
+        <cfargument  name="productDescription">
+        <cfargument  name="productPrice">
+        <cfargument  name="productTax">
+        <cfargument  name="productId">
+        <cfargument  name="productImages">
+        <cfset local.productExistence = checkProductExistence(
+            subCategoryId = arguments.subCategoryId,
+            productName = arguments.productName,
+            productId = arguments.productId
+        )>
+        <cfif NOT local.productExistence>
+            <cfquery name="local.editProduct">
+                UPDATE
+                    tblProduct
+                SET
+                    fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
+                    fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
+                    fldBrandId = <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
+                    fldDescription = <cfqueryparam value="#arguments.productdescription#" cfsqltype="VARCHAR">,
+                    fldPrice = <cfqueryparam value="#arguments.productPrice#" cfsqltype="NUMERIC">,
+                    fldTax = <cfqueryparam value="#arguments.productTax#" cfsqltype="NUMERIC">
+                WHERE
+                    fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
+            </cfquery>
+            <cfif structKeyExists(arguments, "productImages")>
+                <cffile  action="uploadall"
+                    destination=#expandPath("../assets/productImages")#
+                    result="local.uploadedFiles"
+                    nameconflict="makeunique"
+                >
+                <cfloop array="#local.uploadedFiles#" item="item">
+                    <cfquery name="local.insertNewImages">
+                        INSERT INTO
+                            tblProductImages (
+                                fldProductId,
+                                fldImageFileName,
+                                fldDefaultImage,
+                                fldCreatedBy
+                            )
+                        VALUES (
+                            <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">,
+                            <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
+                            0,
+                            <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                        )
+                    </cfquery>
+                </cfloop>
+            </cfif>
+        </cfif>
+        <cfreturn local.productExistence>
+    </cffunction>
+
+    <cffunction  name="editProductImageAutoPopulate" access="remote" returnformat="JSON">
+        <cfargument  name="editProductId">
+        <cfquery name="local.autoPopulateImage">
+            SELECT
+                fldProductImage_ID,
+                fldImageFileName
+            FROM
+                tblProductImages
+            WHERE
+                fldProductId = <cfqueryparam value="#arguments.editProductId#" cfsqltype="NUMERIC">
+                AND fldActive = 1
+        </cfquery>
+        <cfloop query="local.autoPopulateImage">
+            <cfset local.imageStruct[local.autoPopulateImage.fldProductImage_ID] = local.autoPopulateImage.fldImageFileName>
+        </cfloop>
+        <cfreturn local.imageStruct>
     </cffunction>
 
 </cfcomponent>

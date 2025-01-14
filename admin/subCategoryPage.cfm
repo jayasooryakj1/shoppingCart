@@ -65,7 +65,7 @@
                                 </cfoutput>
                             </td>
                             <td><button class="btn btn-danger me-2" value="#subCategoriesDisplay.fldSubCategory_ID#" onclick="deleteSubCategory(this)">Delete</button></td>
-                            <td><a href="productPage.cfm?subCategoryId=#subCategoriesDisplay.fldSubCategory_ID#&subCategoryName=#subCategoriesDisplay.fldSubCategoryName#" class="btn btn-success me-2" value="#subCategoriesDisplay.fldSubCategory_ID#">View</a></td>
+                            <td><a href="productPage.cfm?subCategoryId=#subCategoriesDisplay.fldSubCategory_ID#&subCategoryName=#subCategoriesDisplay.fldSubCategoryName#&categoryId=#url.categoryId#&categoryName=#url.categoryName#" class="btn btn-success me-2" value="#subCategoriesDisplay.fldSubCategory_ID#">View</a></td>
                         </tr>
                     </cfloop>
                 </cfoutput>
