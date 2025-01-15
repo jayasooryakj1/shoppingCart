@@ -95,32 +95,33 @@
 
             <!--- EDIT IMAGE --->
             <div class="modal fade" id="staticBackdropImages" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">EDIT THUMBNAIL</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-                            <div class="carousel-inner d-flex" id="carousel-inner">
+                <form method="POST" >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropHead">EDIT IMAGES</h5>
                             </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="##carouselExampleControls" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="##carouselExampleControls" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
+                            <div class="modal-body">
+                                <div id="carouselControls" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner" id="carousel-inner">
+                                        <div id="carousel-button"></div>
+                                    </div>
+                                    <button class="carousel-control-prev carousalcontrol" type="button" data-bs-target="##carouselControls" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next carousalcontrol" type="button" data-bs-target="##carouselControls" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" onclick="reloadFunction()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">SUBMIT</button>
-                    </div>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!--- ADD/EDIT PRODUCT MODAL --->
@@ -167,10 +168,10 @@
                                 <textarea type="text" cols="60" rows="10" name="productDescription" id="modalProductDescription" required></textarea>
                                 <br><br>
                                 PRODUCT PRICE:<br>
-                                <input type="number" name="productPrice" required id="modalProductPrice">
+                                <input type="number" step=".01" name="productPrice" required id="modalProductPrice">
                                 <br><br>
                                 PRODUCT TAX:<br>
-                                <input type="number" name="productTax" required id="modalProductTax">
+                                <input type="number" step=".01" name="productTax" required id="modalProductTax">
                                 <br><br>
                                 PRODUCT IMAGES:<br>
                                 <input type="file" multiple name="productImages" required id="modalProductImages">

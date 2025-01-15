@@ -194,19 +194,91 @@ function editImage(productStruct) {
                 if (productImages.hasOwnProperty(key)) {
                     var sliderBody = document.createElement('div');
                     var sliderImage = document.createElement('img');
-                    sliderBody.value = key;
+                    document.getElementById("carousel-button").innerHTML = ""
                     if (active == 1) {
                         sliderBody.classList.add("active");
                         active=0;
                     }
+                    var deleteButton = document.createElement('button')
+                    deleteButton.classList.add("btn")
+                    deleteButton.classList.add("btn-danger")
+                    deleteButton.classList.add("mt-2")
+                    deleteButton.classList.add("carouselButton")
+                    deleteButton.type = "button"
+                    deleteButton.value = key;
+                    deleteButton.innerHTML = "DELETE";
+                    deleteButton.id = key+"delete";
+                    deleteButton.onclick = function() {
+                        deleteProductImage(this);
+                    };
+                    var defaultButton = document.createElement('button')
+                    defaultButton.classList.add("btn")
+                    defaultButton.classList.add("btn-primary")
+                    defaultButton.classList.add("mt-2")
+                    defaultButton.classList.add("carouselButton")
+                    defaultButton.type = "button"
+                    defaultButton.value = key;
+                    defaultButton.innerHTML = "SET DEFAULT";
+                    defaultButton.id = key+"edit";
+                    defaultButton.onclick = function() {
+                        defaultProductImage({productId:productStruct.productId,imageId:this});
+                    };
+                    // document.getElementById("carousel-button").appendChild(deleteButton)
                     sliderBody.classList.add("carousel-item");
                     sliderImage.src="../assets/productimages/"+productImages[key];
                     sliderImage.width=350;
+                    sliderBody.appendChild(defaultButton)
+                    sliderBody.appendChild(deleteButton)
                     sliderBody.appendChild(sliderImage)
-                    console.log(sliderBody)
                     document.getElementById("carousel-inner").appendChild(sliderBody)
                 }
             }
         }
     })
 }
+
+// DELETE PRODUCT IMAGE
+function deleteProductImage(imageId) {
+    if (confirm("Delete image?")) {
+        $.ajax({
+            type:"post",
+            url:"components/adminComponent.cfc?method=deleteProductImage",
+            data:{imageId:imageId.value},
+            success:function(){
+                location.reload();
+            }
+        })
+    }
+
+}
+
+// SET DEFAULT IMAGE
+function defaultProductImage(productStruct) {
+    // alert(productStruct.productId)
+    // alert(productStruct.imageId.value)
+    $.ajax({
+        type:"post",
+        url:"components/adminComponent.cfc?method=setDefaultProductImage",
+        data:{imageId:productStruct.imageId.value,productId:productStruct.productId},
+        success:function(result){
+            location.reload();
+        }
+    })
+}
+
+function reloadFunction() {
+    location.reload();    
+}
+
+// function editImageNew(productStruct) {
+//     var productId = productStruct.productId
+//     $.ajax({
+//         type:"POST",
+//         url:"./Components/adminComponent.cfc?method=imageAutoNew",
+//         data:{productId:productId},
+//         success: function(result) {
+//             productImages=JSON.parse(result)
+//             console.log(productImages)
+//         }
+//     });
+// }

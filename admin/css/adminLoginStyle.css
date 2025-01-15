@@ -32,3 +32,17 @@
 .adminInput{
     margin-top: 10px;
 }
+
+.carouselButton{
+    /* top: 10%; */
+    bottom: 0;
+    left: 20%;
+    position: relative;
+}
+
+.carousel-item{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+}

@@ -386,8 +386,8 @@
                     <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
                     <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#arguments.productDescription#" cfsqltype="VARCHAR">,
-                    <cfqueryparam value="#arguments.productPrice#" cfsqltype="NUMERIC">,
-                    <cfqueryparam value="#arguments.productTax#" cfsqltype="NUMERIC">,
+                    <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
+                    <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">,
                     <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
                 )
             </cfquery>
@@ -452,8 +452,8 @@
                     fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
                     fldBrandId = <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
                     fldDescription = <cfqueryparam value="#arguments.productdescription#" cfsqltype="VARCHAR">,
-                    fldPrice = <cfqueryparam value="#arguments.productPrice#" cfsqltype="NUMERIC">,
-                    fldTax = <cfqueryparam value="#arguments.productTax#" cfsqltype="NUMERIC">
+                    fldPrice = <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
+                    fldTax = <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">
                 WHERE
                     fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
             </cfquery>
@@ -502,5 +502,61 @@
         </cfloop>
         <cfreturn local.imageStruct>
     </cffunction>
+
+    <!--- DELETE IMAGE --->
+    <cffunction  name="deleteProductImage" access="remote">
+        <cfargument  name="imageId">
+        <cfquery name="local.deleteImage" result="local.deleteResult">
+            UPDATE
+                tblProductImages
+            SET
+                fldActive = 0
+            WHERE
+                fldProductImage_ID = <cfqueryparam value="#arguments.imageId#" cfsqltype="NUMERIC">
+                AND fldDefaultImage = 0
+        </cfquery>
+    </cffunction>
+
+    <!--- SET DEFAULT IMAGE --->
+    <cffunction  name="setDefaultProductImage" access="remote">
+        <cfargument  name="imageId">
+        <cfargument  name="productId">
+        <cfquery name="local.setAll">
+            UPDATE
+                tblProductImages
+            SET
+                fldDefaultImage = 0
+            WHERE
+                fldProductId = <cfqueryparam value="#arguments.productId#">
+        </cfquery>
+        <cfquery name="local.setDefault">
+            UPDATE
+                tblProductImages
+            SET
+                fldDefaultImage = 1
+            WHERE
+                fldProductImage_ID = <cfqueryparam value="#arguments.imageId#" cfsqltype="NUMERIC">
+        </cfquery>
+    </cffunction>
+
+    <!--- NEW 
+    <cffunction  name="imageAutoNew" access="remote" returntype="struct">
+        <cfargument  name="productId">
+        <cfquery name="local.getProductImages">
+            SELECT
+                fldProductImage_ID,
+                fldImageFileName
+            FROM
+                tblProductImages
+            WHERE
+                fldProductId = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
+                AND fldActive = 1
+        </cfquery>
+        <cfloop query="local.getProductImages">
+            <cfset local.imageStruct[local.getProductImages.fldProductImage_ID] = local.getProductImages.fldImageFileName>
+        </cfloop>
+        <cfreturn local.imageStruct>
+    </cffunction>--->
+
 
 </cfcomponent>

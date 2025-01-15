@@ -59,7 +59,7 @@
                             <td>
                                 <cfoutput>
                                     <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#subCategoriesDisplay.fldSubCategory_ID#" 
-                                    onclick=autoPopulateSubCategory({categoryId:#url.categoryId#,subCategoryName:"#subCategoriesDisplay.fldSubCategoryName#",submitButtonValue:"edit",subCategoryId:#subCategoriesDisplay.fldSubCategory_ID#})>
+                                    onclick=autoPopulateSubCategory({categoryId:#url.categoryId#,subCategoryName:'#subCategoriesDisplay.fldSubCategoryName#',submitButtonValue:"edit",subCategoryId:#subCategoriesDisplay.fldSubCategory_ID#})>
                                         Edit
                                     </button>
                                 </cfoutput>
