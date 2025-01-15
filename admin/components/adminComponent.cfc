@@ -1,7 +1,7 @@
 <cfcomponent>
 
     <!--- ADMIN LOGIN --->
-    <cffunction  name="adminLogin">
+    <cffunction  name="adminLogin" returntype="string">
         <cfargument  name="adminUserName" required="true">
         <cfargument  name="adminPassword" required="true">
         <cfquery name="local.check">
@@ -33,7 +33,7 @@
     </cffunction>
 
     <!--- LOGOUT --->
-    <cffunction  name="logoutFunction" access="remote">
+    <cffunction  name="logoutFunction" access="remote" returntype="boolean">
         <cfset structClear(session)>
         <cfreturn true>
     </cffunction>
@@ -41,7 +41,7 @@
     <!--- CATEGORY FUNCTIONS--->
 
     <!--- ADD CATEGORY --->
-    <cffunction  name="addCategory">
+    <cffunction  name="addCategory" returntype="boolean">
         <cfargument  name="categoryName" required="true">
         <cfset local.categoryExistence = checkCategoryExistence(
             categoryName = arguments.categoryName
@@ -62,7 +62,7 @@
     </cffunction>
 
     <!--- DISPLAY CATEGORIES --->
-    <cffunction  name="dipslayCategories">
+    <cffunction  name="dipslayCategories" returntype="query">
         <cfquery name="local.displayCategories">
             SELECT 
                 fldCategory_ID,
@@ -90,7 +90,7 @@
     </cffunction>
 
     <!--- CHECK IF CATEGORY EXISTS --->
-    <cffunction  name="checkCategoryExistence">
+    <cffunction  name="checkCategoryExistence" returntype="boolean">
         <cfargument  name="categoryName" required="true">
         <cfquery name="local.checkCategory">
             SELECT
@@ -109,7 +109,7 @@
     </cffunction>
 
     <!--- EDIT CATEGORY --->
-    <cffunction  name="editCategory">
+    <cffunction  name="editCategory" returntype="boolean">
         <cfargument  name="categoryName" required="true">
         <cfargument  name="categoryId" required="true">
         <cfset local.categoryExistence = checkCategoryExistence(
@@ -130,7 +130,7 @@
     </cffunction>
 
     <!--- DELETE CATEGORY --->
-    <cffunction  name="deleteCategory" access="remote">
+    <cffunction  name="deleteCategory" access="remote" returntype="boolean">
         <cfargument  name="deleteCategoryId" required="true">
         <cfquery name="local.deleteCategory">
             UPDATE
@@ -140,13 +140,14 @@
             WHERE
                 fldCategory_ID = <cfqueryparam value="#arguments.deleteCategoryId#" cfsqltype="VARCHAR">
         </cfquery>
+        <cfreturn true>
     </cffunction>
 
 
     <!--- SUB CATEGORY FUNCTIONS --->
 
     <!--- SUB CATEGORY DISPLAY --->
-    <cffunction  name="displaySubCategories">
+    <cffunction  name="displaySubCategories" returntype="query">
         <cfargument  name="categoryId" required="true">
         <cfquery name="local.displaySubCategories">
             SELECT 
@@ -162,7 +163,7 @@
     </cffunction>
 
     <!--- CHECK IF SUB CATEGORY EXISTS --->
-    <cffunction  name="checkSubCategoryExistence">
+    <cffunction  name="checkSubCategoryExistence" returntype="boolean">
         <cfargument  name="subCategoryName" required="true">
         <cfargument  name="categoryId" required="true">
         <cfquery name="local.checkSubCategoryExistence">
@@ -184,7 +185,7 @@
 
     <!--- AUTO POPULATE CATEGORY IN MODAL --->
     <cffunction  name="autoPopulateCategoryModalDropDown">
-        <cfquery name="local.autoPopulateCategory">
+        <cfquery name="local.autoPopulateCategory" returntype="query">
             SELECT
                 fldCategory_ID,
                 fldCategoryName
@@ -197,7 +198,7 @@
     </cffunction>
 
     <!--- ADD SUB CATEGORY --->
-    <cffunction  name="addSubCategory">
+    <cffunction  name="addSubCategory" returntype="boolean">
         <cfargument  name="categoryId" required="true">
         <cfargument  name="subCategoryName" required="true">
         <cfset local.subCategoryExistence = checkSubCategoryExistence(
@@ -223,7 +224,7 @@
     </cffunction>
 
     <!--- EDIT SUB CATEGORY --->
-    <cffunction  name="editSubCategory">
+    <cffunction  name="editSubCategory" returntype="boolean">
         <cfargument  name="categoryId" required="true">
         <cfargument  name="subCategoryId" required="true">
         <cfargument  name="subCategoryName" required="true">
@@ -247,7 +248,7 @@
     </cffunction>
 
     <!--- DELETE SUB CATEGORY --->
-    <cffunction  name="deleteSubCategory" access="remote">
+    <cffunction  name="deleteSubCategory" access="remote" returntype="boolean">
         <cfargument  name="deleteSubCategoryId" required="true">
         <cfquery name="deleteSubCategory">
             UPDATE
@@ -258,12 +259,13 @@
             WHERE
                 fldSubCategory_ID = <cfqueryparam value="#arguments.deleteSubCategoryId#" cfsqltype="NUMERIC">
         </cfquery>
+        <cfreturn true>
     </cffunction>
 
     <!--- PRODUCTS --->
     <!--- DISPLAY PRODUCT --->
-    <cffunction  name="displayProduct">
-        <cfargument  name="subCategoryId">
+    <cffunction  name="displayProduct" returntype="query">
+        <cfargument  name="subCategoryId" required="true">
         <cfquery name="local.displayProduct">
             SELECT 
                 fldProduct_ID,
@@ -295,7 +297,7 @@
 
     <!--- AUTO POPULATE SUB CATEGORY NAME --->
     <cffunction  name="autoPopulateSubCategoryModal" access="remote" returnformat="JSON">
-        <cfargument  name="categoryId">
+        <cfargument  name="categoryId" required="true">
         <cfquery name="local.autoPopulateSubCategory">
             SELECT
                 fldSubCategory_ID,
@@ -313,7 +315,7 @@
     </cffunction>
 
     <!--- AUTO POPULATE BRAND --->
-    <cffunction  name="autoPopulateBrand">
+    <cffunction  name="autoPopulateBrand" returntype="query">
         <cfquery name="local.autoPopulateBrand">
             SELECT
                 fldBrand_ID,
@@ -327,10 +329,10 @@
     </cffunction>
 
     <!--- CHECK IF PRODUCT EXISTS --->
-    <cffunction  name="checkProductExistence">
-        <cfargument  name="subCategoryId">
-        <cfargument  name="productName">
-        <cfargument  name="productId">
+    <cffunction  name="checkProductExistence" returntype="boolean">
+        <cfargument  name="subCategoryId" required="true">
+        <cfargument  name="productName" required="true">
+        <cfargument  name="productId" required="true">
         <cfquery name="local.productExistence">
             SELECT
                 fldProductName
@@ -352,14 +354,14 @@
     </cffunction>
 
     <!--- ADD PRODUCT --->
-    <cffunction  name="addProduct">
-        <cfargument  name="subCategoryId">
-        <cfargument  name="productName">
-        <cfargument  name="brandId">
-        <cfargument  name="productDescription">
-        <cfargument  name="productPrice">
-        <cfargument  name="productTax">
-        <cfargument  name="productImages">
+    <cffunction  name="addProduct" returntype="boolean">
+        <cfargument  name="subCategoryId" required="true">
+        <cfargument  name="productName" required="true">
+        <cfargument  name="brandId" required="true">
+        <cfargument  name="productDescription" required="true">
+        <cfargument  name="productPrice" required="true">
+        <cfargument  name="productTax" required="true">
+        <cfargument  name="productImages" required="true">
         <cfset local.productExistence = checkProductExistence(
             subCategoryId = arguments.subCategoryId,
             productName = arguments.productName
@@ -415,8 +417,8 @@
     </cffunction>
 
     <!--- DELETE PRODUCT --->
-    <cffunction  name="deleteProduct" access="remote">
-        <cfargument  name="deleteProductId">
+    <cffunction  name="deleteProduct" access="remote" returntype="boolean">
+        <cfargument  name="deleteProductId" required="true">
         <cfquery name="local.deleteProduct">
             UPDATE
                 tblProduct
@@ -426,18 +428,19 @@
             WHERE
                 fldProduct_ID = <cfqueryparam value="#arguments.deleteProductId#" cfsqltype="NUMERIC">
         </cfquery>
+        <cfreturn true>
     </cffunction>
 
     <!--- EDIT PRODUCT --->
     <cffunction  name="editProduct">
-        <cfargument  name="subCategoryId">
-        <cfargument  name="productName">
-        <cfargument  name="brandId">
-        <cfargument  name="productDescription">
-        <cfargument  name="productPrice">
-        <cfargument  name="productTax">
-        <cfargument  name="productId">
-        <cfargument  name="productImages">
+        <cfargument  name="subCategoryId" required="true">
+        <cfargument  name="productName" required="true">
+        <cfargument  name="brandId" required="true">
+        <cfargument  name="productDescription" required="true">
+        <cfargument  name="productPrice" required="true">
+        <cfargument  name="productTax" required="true">
+        <cfargument  name="productId" required="true">
+        <cfargument  name="productImages" required="true">
         <cfset local.productExistence = checkProductExistence(
             subCategoryId = arguments.subCategoryId,
             productName = arguments.productName,
@@ -485,8 +488,9 @@
         <cfreturn local.productExistence>
     </cffunction>
 
+    <!--- SELECT IMAGE USING PRODUCT ID --->
     <cffunction  name="editProductImageAutoPopulate" access="remote" returnformat="JSON">
-        <cfargument  name="editProductId">
+        <cfargument  name="editProductId" required="true">
         <cfquery name="local.autoPopulateImage">
             SELECT
                 fldProductImage_ID,
@@ -504,8 +508,8 @@
     </cffunction>
 
     <!--- DELETE IMAGE --->
-    <cffunction  name="deleteProductImage" access="remote">
-        <cfargument  name="imageId">
+    <cffunction  name="deleteProductImage" access="remote" returntype="true">
+        <cfargument  name="imageId" required="true">
         <cfquery name="local.deleteImage" result="local.deleteResult">
             UPDATE
                 tblProductImages
@@ -515,12 +519,13 @@
                 fldProductImage_ID = <cfqueryparam value="#arguments.imageId#" cfsqltype="NUMERIC">
                 AND fldDefaultImage = 0
         </cfquery>
+        <cfreturn true>
     </cffunction>
 
     <!--- SET DEFAULT IMAGE --->
-    <cffunction  name="setDefaultProductImage" access="remote">
-        <cfargument  name="imageId">
-        <cfargument  name="productId">
+    <cffunction  name="setDefaultProductImage" access="remote" returntype="boolean">
+        <cfargument  name="imageId" required="true">
+        <cfargument  name="productId" required="true">
         <cfquery name="local.setAll">
             UPDATE
                 tblProductImages
@@ -537,26 +542,7 @@
             WHERE
                 fldProductImage_ID = <cfqueryparam value="#arguments.imageId#" cfsqltype="NUMERIC">
         </cfquery>
+        <cfreturn true>
     </cffunction>
-
-    <!--- NEW 
-    <cffunction  name="imageAutoNew" access="remote" returntype="struct">
-        <cfargument  name="productId">
-        <cfquery name="local.getProductImages">
-            SELECT
-                fldProductImage_ID,
-                fldImageFileName
-            FROM
-                tblProductImages
-            WHERE
-                fldProductId = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
-                AND fldActive = 1
-        </cfquery>
-        <cfloop query="local.getProductImages">
-            <cfset local.imageStruct[local.getProductImages.fldProductImage_ID] = local.getProductImages.fldImageFileName>
-        </cfloop>
-        <cfreturn local.imageStruct>
-    </cffunction>--->
-
 
 </cfcomponent>
