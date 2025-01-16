@@ -12,7 +12,7 @@
 
         <div class="d-flex adminHeader p-3">
             <div>Admin Dashboard</div>
-            <cfset fileName = listLast(cgi.PATH_TRANSLATED, '\')>
+            <cfset fileName = listLast(cgi.SCRIPT_NAME, '/')>
             <cfif fileName NEQ "adminLogin.cfm">
                 <div class="logout"><button class="btn logoutButton" onclick="logout()">LOGOUT</button></div>
             </cfif>

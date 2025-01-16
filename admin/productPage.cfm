@@ -1,5 +1,47 @@
+<cfif structKeyExists(form, "productSubmitButton")>
+    <cfif form.productSubmitButton EQ 1>
+        <cfset result = application.adminObject.addProduct(
+            subCategoryId = form.subCategoryId,
+            productName = form.productName,
+            brandId = form.brandId,
+            productDescription = form.productDescription,
+            productPrice = form.productPrice,
+            productTax = form.productTax,
+            productImages = form.productImages
+        )>
+        <cfif result>
+            <div>Name already exists</div>
+        </cfif>
+    <cfelse>
+        <cfif isDefined("form.productImages") AND form.productImages IS NOT "">
+            <cfset result = application.adminObject.editProduct(
+                subCategoryId = form.subCategoryId,
+                productName = form.productName,
+                brandId = form.brandId,
+                productDescription = form.productDescription,
+                productPrice = form.productPrice,
+                productTax = form.productTax,
+                productId = form.hiddenModalProductId,
+                productImages = form.productImages
+            )>
+        <cfelse>
+            <cfset result = application.adminObject.editProduct(
+                subCategoryId = form.subCategoryId,
+                productName = form.productName,
+                brandId = form.brandId,
+                productDescription = form.productDescription,
+                productPrice = form.productPrice,
+                productTax = form.productTax,
+                productId = form.hiddenModalProductId
+            )>
+        </cfif>
+        <cfif result>
+            <div>name already exists</div>
+        </cfif>
+    </cfif>
+</cfif>
+
 <cfinclude  template="./adminHeader.cfm">
-    <cfset productObject = createObject("component", "components.adminComponent")>
     <cfoutput>
 
             <div class="d-flex flex-column align-items-center justify-content-center mt-5">
@@ -9,52 +51,9 @@
                 </button>
             </div>
 
-            <cfif structKeyExists(form, "productSubmitButton")>
-                <cfif form.productSubmitButton EQ 1>
-                    <cfset result = productObject.addProduct(
-                        subCategoryId = form.subCategoryId,
-                        productName = form.productName,
-                        brandId = form.brandId,
-                        productDescription = form.productDescription,
-                        productPrice = form.productPrice,
-                        productTax = form.productTax,
-                        productImages = form.productImages
-                    )>
-                    <cfif result>
-                        <div>Name already exists</div>
-                    </cfif>
-                <cfelse>
-                    <cfif isDefined("form.productImages") AND form.productImages IS NOT "">
-                        <cfset result = productObject.editProduct(
-                            subCategoryId = form.subCategoryId,
-                            productName = form.productName,
-                            brandId = form.brandId,
-                            productDescription = form.productDescription,
-                            productPrice = form.productPrice,
-                            productTax = form.productTax,
-                            productId = form.hiddenModalProductId,
-                            productImages = form.productImages
-                        )>
-                    <cfelse>
-                        <cfset result = productObject.editProduct(
-                            subCategoryId = form.subCategoryId,
-                            productName = form.productName,
-                            brandId = form.brandId,
-                            productDescription = form.productDescription,
-                            productPrice = form.productPrice,
-                            productTax = form.productTax,
-                            productId = form.hiddenModalProductId
-                        )>
-                    </cfif>
-                    <cfif result>
-                        <div>name already exists</div>
-                    </cfif>
-                </cfif>
-            </cfif>
-
             <!--- DISPLAY PRODUCT --->
             <div class="d-flex align-items-center justify-content-center">
-                <cfset productDisplay = productObject.displayProduct(
+                <cfset productDisplay = application.adminObject.displayProduct(
                     subCategoryId = url.subCategoryId
                 )>
                 <table class="border w-50 mt-3">
@@ -135,11 +134,11 @@
                             </div>
 
                             <div class="modal-body">
-                                <cfset categoryDropDown = productObject.autoPopulateCategoryModalDropDown()>
-                                <cfset subCategoryDropDown = productObject.autoPopulateSubCategoryModal(
+                                <cfset categoryDropDown = application.adminObject.autoPopulateCategoryModalDropDown()>
+                                <cfset subCategoryDropDown = application.adminObject.autoPopulateSubCategoryModal(
                                     categoryId = url.categoryId
                                 )>
-                                <cfset brandDropDown = productObject.autoPopulateBrand()>
+                                <cfset brandDropDown = application.adminObject.autoPopulateBrand()>
                                 CATEGORY:
                                 <select name="categoryId" id="categorySelect" onchange="dropDownChange()">
                                     <cfloop query="categoryDropDown">

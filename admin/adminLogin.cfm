@@ -1,4 +1,21 @@
+<cfif structKeyExists(form, "submit")>
+    <cfset result = application.adminObject.adminlogin(
+        adminUserName=form.adminUserName,
+        adminPassword=form.adminPassword
+    )>
+    <cfif result=="true">
+        <cflocation  url="./index.cfm">
+    <cfelse>
+        <div class="d-flex justify-content-center">
+            <cfoutput>
+                #result#
+            </cfoutput>
+        </div>
+    </cfif>
+</cfif>
+
 <cfinclude  template="./adminHeader.cfm">
+
     <div class="d-flex justify-content-center align-items-center flex-column">
         <div class="adminLoginBody d-flex justify-content-center align-items-center flex-column pt-5">
             <h5><u>ADMIN LOGIN</u></h5>
@@ -13,20 +30,5 @@
             </div>
         </div>
     </div>
-    <cfif structKeyExists(form, "submit")>
-        <cfset adminObject = createObject("component","components.adminComponent")>
-        <cfset result = adminObject.adminlogin(
-            adminUserName=form.adminUserName,
-            adminPassword=form.adminPassword
-        )>
-        <cfif result=="true">
-            <cflocation  url="./index.cfm">
-        <cfelse>
-            <div class="d-flex justify-content-center">
-                <cfoutput>
-                    #result#
-                </cfoutput>
-            </div>
-        </cfif>
-    </cfif>
+    
 <cfinclude  template="./footer.cfm">

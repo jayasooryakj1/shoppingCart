@@ -103,11 +103,6 @@ function deleteSubCategory(deleteSubCategoryId) {
     }
 }
 
-// CLEAR FROM
-function clearFom() {
-    form.reset();
-}
-
 // PRODUCT
 // ADD PRODUCT
 function addProduct(productStruct) {
@@ -185,7 +180,7 @@ function editImage(productStruct) {
     var editProductId = productStruct.productId;
     $.ajax({
         type:"post",
-        url:"components/adminComponent.cfc?method=editProductImageAutoPopulate",
+        url:"components/adminComponent.cfc?method=getImagesByProductId",
         data:{editProductId:editProductId},
         success:function(result){
             productImages=JSON.parse(result)
@@ -223,7 +218,6 @@ function editImage(productStruct) {
                     defaultButton.onclick = function() {
                         defaultProductImage({productId:productStruct.productId,imageId:this});
                     };
-                    // document.getElementById("carousel-button").appendChild(deleteButton)
                     sliderBody.classList.add("carousel-item");
                     sliderImage.src="../assets/productimages/"+productImages[key];
                     sliderImage.width=350;
@@ -254,8 +248,6 @@ function deleteProductImage(imageId) {
 
 // SET DEFAULT IMAGE
 function defaultProductImage(productStruct) {
-    // alert(productStruct.productId)
-    // alert(productStruct.imageId.value)
     $.ajax({
         type:"post",
         url:"components/adminComponent.cfc?method=setDefaultProductImage",
@@ -269,16 +261,3 @@ function defaultProductImage(productStruct) {
 function reloadFunction() {
     location.reload();    
 }
-
-// function editImageNew(productStruct) {
-//     var productId = productStruct.productId
-//     $.ajax({
-//         type:"POST",
-//         url:"./Components/adminComponent.cfc?method=imageAutoNew",
-//         data:{productId:productId},
-//         success: function(result) {
-//             productImages=JSON.parse(result)
-//             console.log(productImages)
-//         }
-//     });
-// }

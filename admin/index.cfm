@@ -1,5 +1,23 @@
+<cfif structKeyExists(form, "createCategory")>
+    <cfset result = application.adminObject.addCategory(
+        categoryName=form.categoryName
+    )>
+    <cfif result>
+        <div>Name already exists</div>
+    </cfif>
+</cfif>
+
+<cfif structKeyExists(form, "editCategory")>
+    <cfset result = application.adminObject.editCategory(
+        categoryName=form.categoryName,
+        categoryId=form.categoryId
+    )>
+    <cfif result>
+        <div>Name already exists</div>
+    </cfif>
+</cfif>
+
 <cfinclude  template="./adminHeader.cfm">
-        <cfset categoryObject = createObject("component", "components.adminComponent")>
         <div class="d-flex flex-column align-items-center justify-content-center mt-5">
             <div>
 
@@ -10,28 +28,9 @@
             </div>
         </div>
 
-        <cfif structKeyExists(form, "createCategory")>
-            <cfset result = categoryObject.addCategory(
-                categoryName=form.categoryName
-            )>
-            <cfif result>
-                <div>Name already exists</div>
-            </cfif>
-        </cfif>
-
-        <cfif structKeyExists(form, "editCategory")>
-            <cfset result = categoryObject.editCategory(
-                categoryName=form.categoryName,
-                categoryId=form.categoryId
-            )>
-            <cfif result>
-                <div>Name already exists</div>
-            </cfif>
-        </cfif>
-
         <!--- DISPLAY CATEGORIES --->
         <div class="d-flex justify-content-center align-items-center">
-            <cfset categoriesDisplay = categoryObject.dipslayCategories()>
+            <cfset categoriesDisplay = application.adminObject.dipslayCategories()>
             <table class="border w-50 mt-3">
                 <tr class="border">
                     <th class="w-75 categoryName">Category Name</th>
