@@ -30,3 +30,48 @@
     background-color: rgb(64, 140, 202);
     color: white;
 }
+
+.dropDown {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  }
+
+  .dropDown:hover {
+    cursor: pointer;
+  }
+
+  .dropDown .tooltiptext {
+    visibility: hidden;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+    
+  }
+
+  .dropDown:hover .tooltiptext {
+    visibility: visible;
+  }
+
+  .randomProducts{
+    overflow-x: hidden;
+    flex-wrap: wrap;
+  }
+
+  .randomProductDiv{
+    height: 300px;
+    width: 200px;
+  }
+
+  .randomProductDiv img{
+    width: 100%;
+  }

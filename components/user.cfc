@@ -93,5 +93,43 @@
         <cfreturn local.getCategory>
     </cffunction>
 
+    <cffunction  name="getSubCategory" returntype="query">
+        <cfquery name="local.getSubCategory">
+            SELECT
+                fldSubCategory_ID,
+                fldCategoryId,
+                fldSubCategoryName
+            FROM
+                tblSubCategory
+            WHERE
+                fldActive = 1
+        </cfquery>
+        <cfreturn local.getSubCategory>
+    </cffunction>
+
+    <!--- SELECT RANDOM PRODUCTS--->
+    <cffunction  name="getproductsInRandom" returntype="query">
+        <cfquery name="local.randomProducts">
+            SELECT
+                fldProduct_ID,
+                fldProductName,
+                fldProductImage_ID,
+                fldImageFileName,
+                fldPrice,
+                fldTax
+            FROM
+                tblProduct AS P
+            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId 
+            AND P.fldActive = 1
+            WHERE
+                P.fldActive = 1
+                AND I.fldDefaultImage = 1
+            ORDER BY
+                RAND()
+            LIMIT 
+                8
+        </cfquery>
+        <cfreturn local.randomProducts>
+    </cffunction>
 
 </cfcomponent>

@@ -1,3 +1,10 @@
+<cfif structKeyExists(form, "loginSubmit")>
+    <cfset userLogin = application.userObject.userLogin(
+        email = form.email,
+        password = form.password
+    )>
+</cfif>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -20,8 +27,45 @@
             <cfset pagesWithNoLogin= ["userSignUp.cfm", "userLogin.cfm"]>
             <cfset fileName = listLast(cgi.SCRIPT_NAME, '/')>
             <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
-                <div>
-                    <button class="btn btn-primary" onclick="logout()">LOGOUT</button> 
-                </div>
+                <cfif structKeyExists(session, "userId")>
+                    <div>
+                        <button class="btn btn-primary" onclick="logout()">LOGOUT</button> 
+                    </div>
+                <cfelse>
+                    <div>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">LOGIN</button> 
+                    </div>
+                </cfif>
             </cfif>
         </div>
+
+        <form method="post">
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">LOGIN</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex flex-column justify-content-center align-items-center">
+                            <div class="ms-3">
+                                EMAIL:
+                                <input type="text" name="email" required>
+                                <br><br>
+                            </div>
+                            <div class="me-4">
+                                PASSWORD:
+                                <input type="password" name="password" required>
+                                <br><br>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" name="loginSubmit">LOGIN</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </form>

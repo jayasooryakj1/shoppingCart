@@ -1,4 +1,3 @@
-
 function logout(){
     if(confirm("Logout?")){
         $.ajax({

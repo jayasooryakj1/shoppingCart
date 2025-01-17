@@ -47,19 +47,27 @@
                         <th></th>
                         <th></th>
                     </tr>
-                    <cfloop query="subCategoriesDisplay">
-                        <tr class="border" id="#subCategoriesDisplay.fldSubCategory_ID#">
-                            <td class="d-flex justify-content-center align-items-center w-75 py-3">#subCategoriesDisplay.fldSubCategoryName#</td>
+                    <cfif queryRecordCount(subCategoriesDisplay)>
+                        <cfloop query="subCategoriesDisplay">
+                            <tr class="border" id="#subCategoriesDisplay.fldSubCategory_ID#">
+                                <td class="d-flex justify-content-center align-items-center w-75 py-3">#subCategoriesDisplay.fldSubCategoryName#</td>
+                                <td>
+                                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#subCategoriesDisplay.fldSubCategory_ID#" 
+                                    onclick=autoPopulateSubCategory({categoryId:#url.categoryId#,subCategoryName:'#subCategoriesDisplay.fldSubCategoryName#',submitButtonValue:"edit",subCategoryId:#subCategoriesDisplay.fldSubCategory_ID#})>
+                                        Edit
+                                    </button>
+                                </td>
+                                <td><button class="btn btn-danger me-2" value="#subCategoriesDisplay.fldSubCategory_ID#" onclick="deleteSubCategory(this)">Delete</button></td>
+                                <td><a href="productPage.cfm?subCategoryId=#subCategoriesDisplay.fldSubCategory_ID#&subCategoryName=#subCategoriesDisplay.fldSubCategoryName#&categoryId=#url.categoryId#&categoryName=#url.categoryName#" class="btn btn-success me-2" value="#subCategoriesDisplay.fldSubCategory_ID#">View</a></td>
+                            </tr>
+                        </cfloop>
+                    <cfelse>
+                        <tr>
                             <td>
-                                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#subCategoriesDisplay.fldSubCategory_ID#" 
-                                onclick=autoPopulateSubCategory({categoryId:#url.categoryId#,subCategoryName:'#subCategoriesDisplay.fldSubCategoryName#',submitButtonValue:"edit",subCategoryId:#subCategoriesDisplay.fldSubCategory_ID#})>
-                                    Edit
-                                </button>
+                                NO SUB CATEGORIES
                             </td>
-                            <td><button class="btn btn-danger me-2" value="#subCategoriesDisplay.fldSubCategory_ID#" onclick="deleteSubCategory(this)">Delete</button></td>
-                            <td><a href="productPage.cfm?subCategoryId=#subCategoriesDisplay.fldSubCategory_ID#&subCategoryName=#subCategoriesDisplay.fldSubCategoryName#&categoryId=#url.categoryId#&categoryName=#url.categoryName#" class="btn btn-success me-2" value="#subCategoriesDisplay.fldSubCategory_ID#">View</a></td>
                         </tr>
-                    </cfloop>
+                    </cfif>
                 </table>
             </div>
 
