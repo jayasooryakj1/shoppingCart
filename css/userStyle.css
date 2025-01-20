@@ -34,7 +34,6 @@
 .dropDown {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
   }
 
   .dropDown:hover {
@@ -43,35 +42,69 @@
 
   .dropDown .tooltiptext {
     visibility: hidden;
-    color: #fff;
+    color: black;
     text-align: center;
     padding: 5px 0;
     border-radius: 6px;
-   
-    /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
     width: 120px;
     top: 100%;
     left: 50%;
     margin-left: -60px;
-    
   }
 
   .dropDown:hover .tooltiptext {
     visibility: visible;
   }
 
-  .randomProducts{
-    overflow-x: hidden;
+  .randomProducts, .listProducts{
     flex-wrap: wrap;
   }
 
   .randomProductDiv{
-    height: 300px;
-    width: 200px;
+    height: 200px;
+    width: 150px;
   }
 
   .randomProductDiv img{
     width: 100%;
+  }
+
+  .dropDown a{
+    text-decoration: none;
+    color: white;
+  }
+
+  .subCategory a,.categoryName a, .randomProducts a, .listProducts a, .link a{
+    text-decoration: none;
+    color: black;
+  }
+
+  .dropDown2 {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropDown2:hover {
+    cursor: pointer;
+  }
+
+  .dropDown2 .tooltiptext2 {
+    visibility: hidden;
+    color: black;
+    background-color: rgb(177, 177, 177);
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+  }
+
+  .dropDown2:hover .tooltiptext2 {
+    visibility: visible;
   }

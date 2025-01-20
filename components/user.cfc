@@ -47,8 +47,8 @@
 
     <!--- LOGIN --->
     <cffunction  name="userLogin" returntype="boolean">
-        <cfargument  name="email">
-        <cfargument  name="password">
+        <cfargument  name="email" required="true" type="string">
+        <cfargument  name="password" required="true" type="string">
         <cfquery name="local.userValidation">
             SELECT
                 fldUser_ID,
@@ -93,7 +93,9 @@
         <cfreturn local.getCategory>
     </cffunction>
 
+    <!--- GET SUBCATEGORY --->
     <cffunction  name="getSubCategory" returntype="query">
+        <cfargument  name="subCategoryId" required="false" type="numeric">
         <cfquery name="local.getSubCategory">
             SELECT
                 fldSubCategory_ID,
@@ -103,6 +105,9 @@
                 tblSubCategory
             WHERE
                 fldActive = 1
+                <cfif structKeyExists(arguments, "subCategoryId")>
+                    AND fldSubCategory_ID = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="numeric">
+                </cfif>
         </cfquery>
         <cfreturn local.getSubCategory>
     </cffunction>
@@ -127,9 +132,60 @@
             ORDER BY
                 RAND()
             LIMIT 
-                8
+                12
         </cfquery>
         <cfreturn local.randomProducts>
+    </cffunction>
+
+    <!--- GET PRODUCTS --->
+    <cffunction  name="getProductName" returntype="query">
+        <cfargument  name="subCategoryId" required="false" type="numeric">
+        <cfargument  name="productId" required="false" type="numeric">
+        <cfquery name="local.getProduct">
+            SELECT
+                fldProduct_ID,
+                fldSubCategoryId,
+                fldProductName,
+                fldProductImage_ID,
+                fldImageFileName,
+                fldPrice,
+                fldTax
+            FROM tblProduct AS P
+            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+            WHERE
+                P.fldActive = 1
+                AND I.fldDefaultImage = 1
+                <cfif structKeyExists(arguments, "subCategoryId")>
+                    AND P.fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="numeric">
+                </cfif>
+                <cfif structKeyExists(arguments, "productId")>
+                    AND P.fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
+                </cfif>
+        </cfquery>
+        <cfreturn local.getProduct>
+    </cffunction>
+
+    <!--- GET PRODUCTS --->
+    <cffunction  name="getProductDetails" returntype="query">
+        <cfargument  name="productId" required="true" type="numeric">
+        <cfquery name="local.getProduct">
+            SELECT
+                fldProduct_ID,
+                fldSubCategoryId,
+                fldProductName,
+                fldDescription,
+                fldProductImage_ID,
+                fldImageFileName,
+                fldPrice,
+                fldTax
+            FROM tblProduct AS P
+            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+            WHERE
+                P.fldActive = 1
+                AND I.fldDefaultImage = 1
+                AND P.fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
+        </cfquery>
+        <cfreturn local.getProduct>
     </cffunction>
 
 </cfcomponent>
