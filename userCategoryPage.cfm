@@ -1,5 +1,5 @@
 <cfset subCategoryName = application.userObject.getSubCategory()>
-<cfset productName = application.userObject.getProductName()>
+<cfset productName = application.userObject.getProduct()>
 <cfset categoryName = application.userObject.getCategory()>
 
 <cfinclude  template="./userHeader.cfm">

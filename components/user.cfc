@@ -138,20 +138,29 @@
     </cffunction>
 
     <!--- GET PRODUCTS --->
-    <cffunction  name="getProductName" returntype="query">
+    <cffunction  name="getProduct" returntype="any" access="remote" returnformat="json">
         <cfargument  name="subCategoryId" required="false" type="numeric">
         <cfargument  name="productId" required="false" type="numeric">
+        <cfargument  name="sort" required="false" type="string">
+        <cfargument  name="range" required="false">
+        <cfif structKeyExists(arguments, "range")>
+            <cfset local.range = deserializeJSON(arguments.range)>
+        </cfif>
         <cfquery name="local.getProduct">
             SELECT
                 fldProduct_ID,
                 fldSubCategoryId,
+                fldDescription,
                 fldProductName,
                 fldProductImage_ID,
                 fldImageFileName,
                 fldPrice,
-                fldTax
+                fldTax,
+                fldBrand_ID,
+                fldBrandName
             FROM tblProduct AS P
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+            LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
             WHERE
                 P.fldActive = 1
                 AND I.fldDefaultImage = 1
@@ -161,31 +170,35 @@
                 <cfif structKeyExists(arguments, "productId")>
                     AND P.fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
                 </cfif>
+                <cfif structKeyExists(arguments, "range")>
+                    AND (fldPrice + fldTax) > <cfqueryparam value="#local.range[1]#" cfsqltype="numeric">
+                    AND (fldPrice + fldTax) < <cfqueryparam value="#local.range[2]#" cfsqltype="numeric">
+                </cfif>
+                <cfif structKeyExists(arguments, "sort")>
+                    <cfif arguments.sort EQ "ASC">
+                        ORDER BY (fldPrice + fldTax) ASC
+                    <cfelse>
+                        ORDER BY (fldPrice + fldTax) DESC
+                    </cfif>
+                </cfif>
         </cfquery>
         <cfreturn local.getProduct>
     </cffunction>
 
-    <!--- GET PRODUCTS --->
-    <cffunction  name="getProductDetails" returntype="query">
+    <!--- GET PRODUCT IMAGES --->
+    <cffunction  name="getProductImages" returntype="query">
         <cfargument  name="productId" required="true" type="numeric">
-        <cfquery name="local.getProduct">
+        <cfquery name="local.getProductImages">
             SELECT
-                fldProduct_ID,
-                fldSubCategoryId,
-                fldProductName,
-                fldDescription,
-                fldProductImage_ID,
                 fldImageFileName,
-                fldPrice,
-                fldTax
-            FROM tblProduct AS P
-            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+                fldDefaultImage
+            FROM
+                tblProductImages
             WHERE
-                P.fldActive = 1
-                AND I.fldDefaultImage = 1
-                AND P.fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
+                fldProductId = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
+                AND fldActive = 1
         </cfquery>
-        <cfreturn local.getProduct>
+        <cfreturn local.getProductImages>
     </cffunction>
 
 </cfcomponent>

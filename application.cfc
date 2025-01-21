@@ -11,7 +11,7 @@
 
    <cffunction  name="onRequestStart" returntype="boolean">
         <cfargument  name="requestedPage">
-        <cfset local.publicPages = ["/admin/adminLogin.cfm", "/userSignUp.cfm", "/userLogin.cfm", "/admin/errorPage.cfm", "/index.cfm", "/userCategoryPage.cfm", "/userSubCategoryPage.cfm", "/productPage.cfm"]>
+        <cfset local.publicPages = ["/admin/adminLogin.cfm", "/userSignUp.cfm", "/userLogin.cfm", "/admin/errorPage.cfm", "/index.cfm", "/userCategoryPage.cfm", "/userSubCategoryPage.cfm", "/productPage.cfm", "/components/user.cfc"]>
         <cfif NOT arrayFind(local.publicPages,arguments.requestedPage) AND NOT structKeyExists(session, "userId")>
             <cfif listFirst(cgi.SCRIPT_NAME, '/') EQ "admin">
                 <cflocation  url="../admin/adminLogin.cfm">

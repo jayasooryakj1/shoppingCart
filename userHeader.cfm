@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="../css/bootstrap-5.0.2-dist/bootstrap-5.0.2-dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="./css/bootstrap-5.0.2-dist/bootstrap-5.0.2-dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/userStyle.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <cfset fileName = listLast(cgi.HTTP_URL, '/')>
         <cfif fileName EQ "userSignUp.cfm">
             <title>User Sign Up</title>
@@ -21,8 +22,8 @@
     </head>
     <body>
         <div class="userHeader d-flex align-items-center p-3">
-            <div>
-                <h3>SHOPPING CART</h3>
+            <div class="link">
+                <h3><a href="index.cfm"> SHOPPING CART </a></h3>
             </div>
             <cfset fileName = listLast(cgi.SCRIPT_NAME, '/')>
             <cfset pagesWithNoSearchBar = ["userSignUp.cfm", "userLogin.cfm"]>
