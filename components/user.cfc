@@ -121,10 +121,12 @@
                 fldProductImage_ID,
                 fldImageFileName,
                 fldPrice,
-                fldTax
+                fldTax,
+                fldBrandName
             FROM
                 tblProduct AS P
-            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId 
+            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+            LEFT JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID
             AND P.fldActive = 1
             WHERE
                 P.fldActive = 1
@@ -199,6 +201,35 @@
                 AND fldActive = 1
         </cfquery>
         <cfreturn local.getProductImages>
+    </cffunction>
+
+    <cffunction  name="searchFunction" returntype="query">
+        <cfargument  name="searchName" required="true" type="string">
+        <cfquery name="local.searchQuery">
+            SELECT
+                fldProduct_ID,
+                fldSubCategoryId,
+                fldDescription,
+                fldProductName,
+                fldProductImage_ID,
+                fldImageFileName,
+                fldPrice,
+                fldTax,
+                fldBrand_ID,
+                fldBrandName
+            FROM tblProduct AS P
+            LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
+            LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
+            WHERE
+                P.fldActive = 1
+                AND I.fldDefaultImage = 1
+                AND (
+                    P.fldProductName LIKE <cfqueryparam value="%#arguments.searchName#%" cfsqltype="varchar">
+                    OR B.fldBrandName LIKE <cfqueryparam value="%#arguments.searchName#%" cfsqltype="varchar">
+                    OR P.fldDescription LIKE <cfqueryparam value="%#arguments.searchName#%" cfsqltype="varchar">
+                )
+        </cfquery>
+        <cfreturn local.searchQuery>
     </cffunction>
 
 </cfcomponent>

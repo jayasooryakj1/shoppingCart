@@ -38,7 +38,7 @@ function filter(subCategoryId) {
     if (flag == true) {
         $.ajax({
             type:"post",
-            url:"components/user.cfc?method=getProductName",
+            url:"components/user.cfc?method=getProduct",
             data:{subCategoryId:subCategoryId,range:range},
             success:function(result){
                 $("#parentDiv").empty()

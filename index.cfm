@@ -35,8 +35,10 @@
                                 #randomProducts.fldProductName#
                             </div>
                             <div>
-                                <cfset price = randomProducts.fldPrice + randomProducts.fldTax>
-                                #price#
+                                #randomProducts.fldBrandName#
+                            </div>
+                            <div>
+                                <i class="fa-solid fa-indian-rupee-sign"></i> #randomProducts.fldPrice + randomProducts.fldTax#
                             </div>
                         </a>
                     </div>

@@ -28,10 +28,12 @@
             <cfset fileName = listLast(cgi.SCRIPT_NAME, '/')>
             <cfset pagesWithNoSearchBar = ["userSignUp.cfm", "userLogin.cfm"]>
             <cfif NOT arrayFind(pagesWithNoSearchBAr, fileName)>
-                <div class="searchBar w-25 d-flex align-items-center">
-                    <div><input type="text" placeholder="Search" class="w-100 px-4 rounded-pill border border-none"></div>
-                    <div><button class="btn btn-light ms-1 p-1">Search</butotn></div>
-                </div>
+                <form action="./userSubCategoryPage.cfm" method="get">
+                    <div class="searchBar w-100 d-flex align-items-center">
+                        <div><input type="text" name="search" placeholder="Search" class="w-100 px-4 rounded-pill border border-none"></div>
+                        <div><button class="btn btn-light ms-1 p-1">Search</butotn></div>
+                        </div>
+                </form>
             </cfif>
             <cfset pagesWithNoLogin = ["userSignUp.cfm", "userLogin.cfm"]>
             <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
