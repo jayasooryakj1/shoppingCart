@@ -112,6 +112,27 @@
   .carousel{
     height: 250px;
     width: 250px;
-    margin-top: 110px;
-    margin-left: 30px;
+    margin-top: 30px;
+  }
+
+  .totalCard{
+    height: 200px;
+  }
+
+  .cartIcon{
+    position: relative;
+  }
+
+  .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 2px 1px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+  }
+
+  .res{
+    color: green;
   }

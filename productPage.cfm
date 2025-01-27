@@ -9,7 +9,7 @@
 <cfinclude  template="./userHeader.cfm">
 
     <cfoutput>
-        <div class="d-flex ms-5">
+        <div class="d-flex">
             <div>
                 <div id="carouselExampleControls" class="carousel d-flex align-items-center justify-content-center slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
@@ -31,13 +31,13 @@
                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
                       <span class="visually-hidden">Next</span>
                     </button>
-                </div>
-                <div class="d-flex mt-5 pt-5 justofy-content-center align-items-center">
-                    <div class="w-50"><button class="w-100 btn btn-warning">BUY</button></div>
-                    <div class="w-50"><button class="w-100 ms-1 btn btn-primary">ADD TO CART</button></div>
+                </div>  
+                <div class="d-flex mt-5 pt-5 justify-content-center align-items-center">
+                    <div class="w-50"><button type="button" name="buy" class="w-100 btn btn-warning">BUY</button></div>
+                    <div class="w-50"><button type="button" onclick="addToCart(#productDetails.fldProduct_ID#)" name="add" class="w-100 ms-1 btn btn-primary">ADD TO CART</button></div>
                 </div>
             </div>
-            <div class="ms-5 mt-5 pt-5">
+            <div class="ms-5 mt-5">
                 <div>
                     <h3>#productDetails.fldProductName#</h3>
                 </div>
@@ -50,6 +50,9 @@
                 </div>
                 <div>
                     #productDetails.fldDescription#
+                </div>
+                <br>
+                <div id="response" class="res">
                 </div>
             </div>
         </div>

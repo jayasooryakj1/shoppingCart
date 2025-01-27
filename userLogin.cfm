@@ -4,9 +4,17 @@
         password = form.password
     )>
     <cfif result>
-        <cflocation  url="index.cfm">
+        <cfif structKeyExists(url, "productId")>
+            <cfset addItemToCart = application.userObject.addToCart(
+                productId = url.productId
+            )>
+            <cflocation  url="./productPage.cfm?productId=#url.productId#">
+        <cfelse>
+            <cflocation  url="index.cfm">
+        </cfif>
     </cfif>
 </cfif>
+
 
 <cfinclude  template="./userHeader.cfm">
 
@@ -34,6 +42,9 @@
                 Invalid email or password
             </div>
         </cfif>
+        <div>
+            <a href="./userSignUp.cfm">SIGNUP</a>
+        </div>
     </div>
 
 <cfinclude  template="./userFooter.cfm">

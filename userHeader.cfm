@@ -4,8 +4,11 @@
         password = form.password
     )>
 </cfif>
-
+<cfset displayCategory = application.userObject.getCategory()>
+<cfset displaySubCategory = application.userObject.getSubCategory()>
 <!DOCTYPE html>
+<cfoutput>
+
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -27,15 +30,28 @@
             </div>
             <cfset fileName = listLast(cgi.SCRIPT_NAME, '/')>
             <cfset pagesWithNoSearchBar = ["userSignUp.cfm", "userLogin.cfm"]>
-            <cfif NOT arrayFind(pagesWithNoSearchBAr, fileName)>
+            <cfif NOT arrayFind(pagesWithNoSearchBar, fileName)>
                 <form action="./userSubCategoryPage.cfm" method="get">
                     <div class="searchBar w-100 d-flex align-items-center">
-                        <div><input type="text" name="search" placeholder="Search" class="w-100 px-4 rounded-pill border border-none"></div>
+                        <div><input type="text" name="search" placeholder="Search" class="w-100 px-4 rounded-pill border border-none" required></div>
                         <div><button class="btn btn-light ms-1 p-1">Search</butotn></div>
                         </div>
                 </form>
             </cfif>
             <cfset pagesWithNoLogin = ["userSignUp.cfm", "userLogin.cfm"]>
+            <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
+                <div>
+                    <a href="./cart.cfm" class="cartIcon">
+                        <i class="fa-solid fa-cart-shopping text-light"></i>
+                        <cfif structKeyExists(session, "userId")>
+                            <cfset cartCount = application.userObject.displayCart()>
+                            <span class="badge" id="notificationCounter">
+                                #queryRecordCount(cartCount)#
+                            </span>
+                        </cfif>
+                    </a>
+                </div>
+            </cfif>
             <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
                 <cfif structKeyExists(session, "userId")>
                     <div>
@@ -43,39 +59,30 @@
                     </div>
                 <cfelse>
                     <div>
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">LOGIN</button> 
+                        <a href="./userLogin.cfm">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="##staticBackdrop">LOGIN</button> 
+                        </a>
                     </div>
                 </cfif>
             </cfif>
         </div>
-
-        <form method="post">
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">LOGIN</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="d-flex flex-column justify-content-center align-items-center">
-                            <div class="ms-3">
-                                EMAIL:
-                                <input type="text" name="email" required>
-                                <br><br>
-                            </div>
-                            <div class="me-4">
-                                PASSWORD:
-                                <input type="password" name="password" required>
-                                <br><br>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" name="loginSubmit">LOGIN</button>
-                    </div>
-                    </div>
+        <div class="categoryBar">
+        <cfloop query="displayCategory">
+            <div class="dropDown">
+                <a href="userCategoryPage.cfm?categoryId=#displayCategory.fldCategory_ID#">
+                    #displayCategory.fldCategoryName#
+                </a>
+                <div class="tooltiptext">
+                    <cfloop query="displaySubCategory">
+                        <cfif displayCategory.fldCategory_ID EQ displaySubCategory.fldCategoryId>
+                            <a href="userSubCategoryPage.cfm?subCategoryId=#displaySubCategory.fldSubCategory_ID#">
+                                <button class="btn btn-light w-100">#displaySubCategory.fldSubCategoryName#</button>
+                            </a>
+                        </cfif>
+                    </cfloop>
                 </div>
             </div>
-        </form>
+        </cfloop>
+        </div>
+</cfoutput>
+<div class="p-3">

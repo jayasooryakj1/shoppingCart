@@ -112,7 +112,7 @@
         <cfreturn local.getSubCategory>
     </cffunction>
 
-    <!--- SELECT RANDOM PRODUCTS--->
+    <!--- SELECT RANDOM PRODUCTS --->
     <cffunction  name="getproductsInRandom" returntype="query">
         <cfquery name="local.randomProducts">
             SELECT
@@ -125,11 +125,15 @@
                 fldBrandName
             FROM
                 tblProduct AS P
+            LEFT JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
+            LEFT JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
             LEFT JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID
             AND P.fldActive = 1
             WHERE
                 P.fldActive = 1
+                AND S.fldActive = 1
+                AND C.fldActive = 1
                 AND I.fldDefaultImage = 1
             ORDER BY
                 RAND()
@@ -141,6 +145,7 @@
 
     <!--- GET PRODUCTS --->
     <cffunction  name="getProduct" returntype="any" access="remote" returnformat="json">
+        <cfargument  name="productIds" required="false" type="string">
         <cfargument  name="subCategoryId" required="false" type="numeric">
         <cfargument  name="productId" required="false" type="numeric">
         <cfargument  name="sort" required="false" type="string">
@@ -161,20 +166,27 @@
                 fldBrand_ID,
                 fldBrandName
             FROM tblProduct AS P
+            LEFT JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
+            LEFT JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
             LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
             WHERE
                 P.fldActive = 1
                 AND I.fldDefaultImage = 1
+                AND S.fldActive = 1
+                AND C.fldActive = 1
                 <cfif structKeyExists(arguments, "subCategoryId")>
                     AND P.fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="numeric">
                 </cfif>
                 <cfif structKeyExists(arguments, "productId")>
                     AND P.fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
                 </cfif>
-                <cfif structKeyExists(arguments, "range")>
+                <cfif structKeyExists(arguments, "range") AND val(local.range[1]) AND val(local.range[2])>
                     AND (fldPrice + fldTax) > <cfqueryparam value="#local.range[1]#" cfsqltype="numeric">
                     AND (fldPrice + fldTax) < <cfqueryparam value="#local.range[2]#" cfsqltype="numeric">
+                </cfif>
+                <cfif structKeyExists(arguments, "productIds")>
+                    AND P.fldProduct_ID NOT IN (<cfqueryparam value="#arguments.productIds#" cfsqltype="integer" list="true">)
                 </cfif>
                 <cfif structKeyExists(arguments, "sort")>
                     <cfif arguments.sort EQ "ASC">
@@ -182,6 +194,9 @@
                     <cfelse>
                         ORDER BY (fldPrice + fldTax) DESC
                     </cfif>
+                <cfelse>
+                    ORDER BY
+                        RAND()
                 </cfif>
         </cfquery>
         <cfreturn local.getProduct>
@@ -203,6 +218,7 @@
         <cfreturn local.getProductImages>
     </cffunction>
 
+    <!--- SEARCH FUNCTION --->
     <cffunction  name="searchFunction" returntype="query">
         <cfargument  name="searchName" required="true" type="string">
         <cfquery name="local.searchQuery">
@@ -218,11 +234,15 @@
                 fldBrand_ID,
                 fldBrandName
             FROM tblProduct AS P
+            LEFT JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
+            LEFT JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
             LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
             WHERE
                 P.fldActive = 1
                 AND I.fldDefaultImage = 1
+                AND S.fldActive = 1
+                AND C.fldActive = 1
                 AND (
                     P.fldProductName LIKE <cfqueryparam value="%#arguments.searchName#%" cfsqltype="varchar">
                     OR B.fldBrandName LIKE <cfqueryparam value="%#arguments.searchName#%" cfsqltype="varchar">
@@ -230,6 +250,86 @@
                 )
         </cfquery>
         <cfreturn local.searchQuery>
+    </cffunction>
+
+    <!--- DISPLAY CART --->
+    <cffunction  name="displayCart" returntype="query">
+        <cfargument  name="productId" required="false" type="numeric">
+        <cfquery name="local.displayCart">
+            SELECT
+                fldCart_ID,
+                C.fldProductId,
+                fldProductName,
+                fldPrice,
+                fldTax,
+                fldBrandName,
+                fldQuantity,
+                fldImageFileName
+            FROM
+                tblCart AS C
+            LEFT JOIN tblProduct AS P ON C.fldProductId = P.fldProduct_ID
+            LEFT JOIN tblProductImages AS I ON C.fldProductId = I.fldProductId
+                AND I.fldDefaultImage = 1
+            LEFT JOIN tblBrands AS B ON P.fldBrandId = b.fldBrand_ID
+            WHERE C.fldUserId = <cfqueryparam value="#session.userId#" cfsqltype="numeric">
+            <cfif structKeyExists(arguments, "productId")>
+                AND C.fldProductId = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
+            </cfif>
+        </cfquery>
+        <cfreturn local.displayCart>
+    </cffunction>
+
+    <!--- ADD TO CART --->
+    <cffunction  name="addToCart" returntype="struct" returnformat="JSON" access="remote">
+        <cfargument  name="productId" required="true" type="numeric">
+        <cfif structKeyExists(session, "userId")>
+            <cfset local.productInCart = displayCart(
+                productId = arguments.productId
+            )>
+            <cfif queryRecordCount(local.productInCart)>
+                <cfset local.updateCart = updateCart(
+                    updateType="+",
+                    cartId=local.productInCart.fldCart_ID
+                )>
+            <cfelse>
+                <cfset local.resultStruct["count"] = 1>
+                <cfquery name="local.addToCart">
+                    INSERT INTO
+                        tblCart (
+                            fldUserId,
+                            fldProductId,
+                            fldQuantity
+                        )
+                    VALUES (
+                        <cfqueryparam value="#session.userId#" cfsqltype="numeric">,
+                        <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">,
+                        1
+                    )
+                </cfquery>
+            </cfif>
+            <cfset local.resultStruct["success"]=true>
+        <cfelse>
+            <cfset local.resultStruct["redirect"]=true>
+        </cfif>
+        <cfreturn local.resultStruct>
+    </cffunction>
+
+    <!--- UPDATE CART --->
+    <cffunction  name="updateCart" access="remote">
+        <cfargument  name="updateType" required="true" type="string">
+        <cfargument  name="cartId" required="true" type="numeric">
+        <cfquery name="local.updateCartQuery">
+            UPDATE
+                tblCart
+            SET
+                <cfif arguments.updateType EQ "-">
+                    fldQuantity = fldQuantity - 1
+                <cfelse>
+                    fldQuantity = fldQuantity + 1
+                </cfif>
+            WHERE
+                fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
+        </cfquery>
     </cffunction>
 
 </cfcomponent>
