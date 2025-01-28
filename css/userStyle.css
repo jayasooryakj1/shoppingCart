@@ -1,0 +1,32 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+.userHeader{
+    background-color: rgb(96, 165, 220);
+    color: white;
+}
+
+.userHeader{
+    justify-content: space-between;
+}
+
+.passwordInput{
+    margin-right: 37px;
+}
+
+.phoneInput{
+    margin-right: 75px;
+}
+
+.passwordInputLogin{
+    margin-right: 31px;
+}
+
+.categoryBar{
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgb(64, 140, 202);
+    color: white;
+}
