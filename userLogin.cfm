@@ -1,6 +1,6 @@
 <cfif structKeyExists(form, "loginSubmit")>
     <cfset result = application.userObject.userLogin(
-        email = form.email,
+        userName = form.userName,
         password = form.password
     )>
     <cfif result>
@@ -25,12 +25,10 @@
                     <h4>LOGIN</h4>
                 </div>
                 <div class="p-2">
-                    Email:
-                    <input type="email" name="email" required>
+                    <input name="userName" required placeholder="Email/Phone">
                 </div>
-                <div class="p-4 passwordInputLogin">
-                    password:
-                    <input type="password" name="password" required>
+                <div class="p-2 passwordInputLogin">
+                    <input type="password" name="password" required placeholder="password">
                 </div>
                 <div>
                     <button class="btn btn-success" name="loginSubmit" type="submit">SUBMIT</button>

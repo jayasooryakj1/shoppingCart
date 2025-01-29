@@ -1,11 +1,6 @@
-<cfif structKeyExists(form, "loginSubmit")>
-    <cfset userLogin = application.userObject.userLogin(
-        email = form.email,
-        password = form.password
-    )>
-</cfif>
-<cfset displayCategory = application.userObject.getCategory()>
-<cfset displaySubCategory = application.userObject.getSubCategory()>
+<!---<cfset displayCategory = application.userObject.getCategory()>
+<cfset displaySubCategory = application.userObject.getSubCategory()>--->
+<cfset variables.categoryDropdown = application.userObject.getCategory()>
 <!DOCTYPE html>
 <cfoutput>
 
@@ -67,18 +62,26 @@
             </cfif>
         </div>
         <div class="categoryBar">
-        <cfloop query="displayCategory">
+        <cfloop query="variables.categoryDropdown" group="fldCategory_ID">
             <div class="dropDown">
-                <a href="userCategoryPage.cfm?categoryId=#displayCategory.fldCategory_ID#">
-                    #displayCategory.fldCategoryName#
+                <a href="userCategoryPage.cfm?categoryId=#variables.categoryDropdown.fldCategory_ID#">
+                    #variables.categoryDropdown.fldCategoryName#
                 </a>
                 <div class="tooltiptext">
-                    <cfloop query="displaySubCategory">
-                        <cfif displayCategory.fldCategory_ID EQ displaySubCategory.fldCategoryId>
-                            <a href="userSubCategoryPage.cfm?subCategoryId=#displaySubCategory.fldSubCategory_ID#">
-                                <button class="btn btn-light w-100">#displaySubCategory.fldSubCategoryName#</button>
-                            </a>
-                        </cfif>
+                    <cfquery name="variables.subCategoryName" dbtype="query">
+                        SELECT
+                            fldSubCategoryName,
+                            fldSubCategory_ID
+                        FROM
+                            variables.categoryDropdown
+                        WHERE
+                            fldSubCategory_ID IS NOT NULL
+                            AND fldCategory_ID = #variables.categoryDropdown.fldCategory_ID#
+                    </cfquery>
+                    <cfloop query="variables.subCategoryName">
+                        <a href="userSubCategoryPage.cfm?subCategoryId=#variables.subCategoryName.fldSubCategory_ID#">
+                            <button class="btn btn-light w-100">#variables.subCategoryName.fldSubCategoryName#</button>
+                        </a>
                     </cfloop>
                 </div>
             </div>

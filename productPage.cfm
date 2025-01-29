@@ -2,7 +2,7 @@
     productId = url.productId
 )>
 
-<cfset productDetails = application.userObject.getProduct(
+<cfset productDetails = application.userObject.getProducts(
     productId = url.productId
 )>
 
@@ -19,7 +19,7 @@
                             <cfelse>
                                 <div class="carousel-item">
                             </cfif>
-                                    <img src="assets/productImages/#productImages.fldImageFileName#" class="d-block w-100" alt="productImage">
+                                    <img src="assets/productImages/#productImages.fldImageFileName#" class="d-block w-75" alt="productImage">
                                 </div>
                         </cfloop>
                     </div>
