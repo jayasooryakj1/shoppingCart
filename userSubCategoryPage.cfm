@@ -1,5 +1,5 @@
 <cfif structKeyExists(url, "search")>
-    <cfset subCategoryProducts = application.userObject.getProducts(
+    <cfset variables.subCategoryProducts = application.userObject.getProducts(
         search = url.search
     )>
     <cfset variables.productCount = application.userObject.getProductsCount(
@@ -7,19 +7,19 @@
     )>
 <cfelse>
     <cfif structKeyExists(url, "ascending")>
-        <cfset subCategoryProducts = application.userObject.getProducts(
+        <cfset variables.subCategoryProducts = application.userObject.getProducts(
             sort = "ASC",
             subCategoryId = url.subCategoryId,
             limit = 6
         )>
     <cfelseif structKeyExists(url, "descending")>
-        <cfset subCategoryProducts = application.userObject.getProducts(
+        <cfset variables.subCategoryProducts = application.userObject.getProducts(
             sort = "DESC",
             subCategoryId = url.subCategoryId,
             limit = 6
         )>
     <cfelse>
-        <cfset subCategoryProducts = application.userObject.getProducts(
+        <cfset variables.subCategoryProducts = application.userObject.getProducts(
             subCategoryId = url.subCategoryId,
             limit = 6
         )>
@@ -38,7 +38,7 @@
                         <a href="index.cfm">
                             Home >
                         </a>
-                        #subCategoryProducts.fldSubCategoryName#
+                        #variables.subCategoryProducts.fldSubCategoryName#
                     </h3>
                 </div>
                 <div>
@@ -92,45 +92,45 @@
                 </div>
             </div>
         </cfif>
-        <cfif NOT queryRecordCount(subCategoryProducts) AND structKeyExists(url, "search")>
+        <cfif NOT queryRecordCount(variables.subCategoryProducts) AND structKeyExists(url, "search")>
             <h4 class="mt-5 ms-3">* NO SEARCH RESULTS FOR "#url.search#" *</h4>
-        <cfelseif queryRecordCount(subCategoryProducts) AND structKeyExists(url, "search")>
+        <cfelseif queryRecordCount(variables.subCategoryProducts) AND structKeyExists(url, "search")>
             <h4 class="mt-5 ms-3">SEARCH RESULTS FOR "#url.search#" </h4>
         </cfif>
         <cfset productIds = []>
         <div class="d-flex listProducts" id="parentDiv">
-            <cfif queryRecordCount(subCategoryProducts) AND len(valueArray(subCategoryProducts, "fldProduct_Id")[1])>
+            <cfif queryRecordCount(variables.subCategoryProducts) AND len(valueArray(variables.subCategoryProducts, "fldProduct_Id")[1])>
                 <cfif structKeyExists(url, "search")>
-                    <cfloop query="subCategoryProducts">
-                        <cfset  arrayAppend(productIds, subCategoryProducts.fldProduct_ID)>
+                    <cfloop query="variables.subCategoryProducts">
+                        <cfset  arrayAppend(productIds, variables.subCategoryProducts.fldProduct_ID)>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-5 me-5 border p-2 rounded">
-                            <a href="productPage.cfm?productId=#subCategoryProducts.fldProduct_ID#">
+                            <a href="productPage.cfm?productId=#variables.subCategoryProducts.fldProduct_ID#">
                                 <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
-                                    <img src="assets/productImages/#subCategoryProducts.fldImageFileName#" class="w-100" alt="productImage">
+                                    <img src="assets/productImages/#variables.subCategoryProducts.fldImageFileName#" class="w-100" alt="productImage">
                                 </div>
                                 <div>
-                                    #subCategoryProducts.fldProductName#
+                                    #variables.subCategoryProducts.fldProductName#
                                 </div>
                                 <div>
-                                    <cfset price = subCategoryProducts.fldPrice + subCategoryProducts.fldTax>
+                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax>
                                     #price#
                                 </div>
                             </a>
                         </div>
                     </cfloop>
                 <cfelse>
-                    <cfloop query="subCategoryProducts">
-                        <cfset  arrayAppend(productIds, subCategoryProducts.fldProduct_ID)>
+                    <cfloop query="variables.subCategoryProducts">
+                        <cfset  arrayAppend(productIds, variables.subCategoryProducts.fldProduct_ID)>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-5 me-5 border p-2 rounded">
-                            <a href="productPage.cfm?productId=#subCategoryProducts.fldProduct_ID#">
+                            <a href="productPage.cfm?productId=#variables.subCategoryProducts.fldProduct_ID#">
                                 <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
-                                    <img src="assets/productImages/#subCategoryProducts.fldImageFileName#" class="w-100" alt="productImage">
+                                    <img src="assets/productImages/#variables.subCategoryProducts.fldImageFileName#" class="w-100" alt="productImage">
                                 </div>
                                 <div>
-                                    #subCategoryProducts.fldProductName#
+                                    #variables.subCategoryProducts.fldProductName#
                                 </div>
                                 <div>
-                                    <cfset price = subCategoryProducts.fldPrice + subCategoryProducts.fldTax>
+                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax>
                                     #price#
                                 </div>
                             </a>
@@ -143,16 +143,16 @@
         </div>
         <br>
         <cfif structKeyExists(url, "subCategoryId")>
-            <cfset subCategoryId = url.subCategoryId>
+            <cfset variables.subCategoryId = url.subCategoryId>
         <cfelse>
-            <cfset subCategoryId = 0>
+            <cfset variables.subCategoryId = 0>
         </cfif>
         <cfif variables.productCount.count GT 6 AND NOT structKeyExists(url, "search")>
             <div class="d-flex align-items-center justify-content-center">
                 <div>
                     <button id="showMore" class="btn btn-outline-primary p-1" 
                         onclick="showMore('#arraytoList(productIds)#',
-                            #subCategoryId#
+                            #variables.subCategoryId#
                             <cfif structKeyExists(form, "ascending")>,'ASC'</cfif>
                             <cfif structKeyExists(form, "descending")>,'DESC'</cfif>
                         )">SHOW MORE

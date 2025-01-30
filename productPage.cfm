@@ -1,4 +1,4 @@
-<cfset productImages = application.userObject.getProductImages(
+<cfset variables.productImages = application.userObject.getProductImages(
     productId = url.productId
 )>
 
@@ -13,13 +13,13 @@
             <div>
                 <div id="carouselExampleControls" class="carousel d-flex align-items-center justify-content-center slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        <cfloop query="#productImages#">
-                            <cfif productImages.fldDefaultImage EQ 1>
+                        <cfloop query="#variables.productImages#">
+                            <cfif variables.productImages.fldDefaultImage EQ 1>
                                 <div class="carousel-item active">
                             <cfelse>
                                 <div class="carousel-item">
                             </cfif>
-                                    <img src="assets/productImages/#productImages.fldImageFileName#" class="d-block w-75" alt="productImage">
+                                    <img src="assets/productImages/#variables.productImages.fldImageFileName#" class="d-block w-75" alt="productImage">
                                 </div>
                         </cfloop>
                     </div>

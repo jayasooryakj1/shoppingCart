@@ -1,4 +1,4 @@
-<cfset productDetails = application.userObject.getProducts(
+<cfset variables.productDetails = application.userObject.getProducts(
     categoryId = url.categoryId
 )>
 <cfinclude  template="./userHeader.cfm">
@@ -9,9 +9,9 @@
             <cfset productsPresent = 0>
                 <h3 class="categoryName">
                     <a href="index.cfm">Home ></a>
-                    #productDetails.fldCategoryName#
+                    #variables.productDetails.fldCategoryName#
                 </h3>
-                <cfloop query="productDetails" group="fldSubCategory_ID">
+                <cfloop query="variables.productDetails" group="fldSubCategory_ID">
                     <cfquery name="subCategoryProducts" dbtype="query">
                         SELECT 
                             fldProduct_ID,
@@ -24,15 +24,15 @@
                             fldSubCategoryName,
                             fldImageFileName
                         FROM
-                            productDetails
+                            variables.productDetails
                         WHERE
-                            fldSubCategory_ID = #productDetails.fldSubCategory_ID#
+                            fldSubCategory_ID = #variables.productDetails.fldSubCategory_ID#
                             AND fldProduct_ID IS NOT NULL 
                             AND fldSubCategory_ID IS NOT NULL
                     </cfquery>
                     <h4 class="mt-4 subCategory">
-                        <a href="userSubCategoryPage.cfm?subCategoryId=#productDetails.fldSubCategory_ID#">
-                            #productDetails.fldSubCategoryName#
+                        <a href="userSubCategoryPage.cfm?subCategoryId=#variables.productDetails.fldSubCategory_ID#">
+                            #variables.productDetails.fldSubCategoryName#
                         </a>
                     </h4>
                     <div class="d-flex">

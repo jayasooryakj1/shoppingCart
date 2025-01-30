@@ -1,9 +1,9 @@
 <cfif structKeyExists(form, "loginSubmit")>
-    <cfset result = application.userObject.userLogin(
+    <cfset variables.result = application.userObject.userLogin(
         userName = form.userName,
         password = form.password
     )>
-    <cfif result>
+    <cfif variables.result>
         <cfif structKeyExists(url, "productId")>
             <cfset addItemToCart = application.userObject.addToCart(
                 productId = url.productId
@@ -35,7 +35,7 @@
                 </div>
             </div>
         </form>
-        <cfif structKeyExists(variables, "result") AND NOT result>
+        <cfif structKeyExists(variables, "result") AND NOT variables.result>
             <div>
                 Invalid email or password
             </div>

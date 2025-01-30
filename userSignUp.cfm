@@ -1,12 +1,12 @@
 <cfif structKeyExists(form, "submit")>
-    <cfset result = application.userObject.userSignUp(
+    <cfset variables.result = application.userObject.userSignUp(
         firstName = form.firstName,
         lastName = form.lastName,
         email = form.email,
         phoneNumber = form.phoneNumber,
         password = form.password
     )>
-    <cfif structKeyExists(variables, "result") AND result>
+    <cfif structKeyExists(variables, "result") AND variables.result>
         <div>
             Email already Exists
         </div>
