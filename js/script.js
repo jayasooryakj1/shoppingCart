@@ -156,3 +156,16 @@ function deleteCart(cartId) {
         }
     })
 }
+
+function deleteAddress(addressId) {
+    if(confirm("Delete address?")){
+        $.ajax({
+            type:"post",
+            url:"components/user.cfc?method=deleteAddress",
+            data:{addressId:addressId.value},
+            success:function(){
+                document.getElementById("address"+addressId.value).remove();
+            }
+        })
+    }
+}

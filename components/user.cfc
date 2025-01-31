@@ -217,7 +217,7 @@
         <cfreturn local.getProducts>
     </cffunction>
 
-
+    <!--- GET PRODUCT COUNT --->
     <cffunction  name="getProductsCount" returntype="query" access="remote" returnformat="json">
         <cfargument  name="search" required="false" type="string">
         <cfargument  name="subCategoryId" required="false" type="integer">
@@ -383,6 +383,127 @@
                 tblCart
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
+        </cfquery>
+        <cfreturn true>
+    </cffunction>
+
+    <!--- GET USER DETAILS --->
+    <cffunction  name="getUserDetails" returntype="query">
+        <cfargument  name="userId" required="true" type="numeric">
+        <cfquery name="local.userDetails">
+            SELECT
+                fldUser_ID,
+                fldFirstName,
+                fldLastName,
+                fldEmail,
+                fldPhone
+            FROM
+                tbluser
+            WHERE
+                fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
+        </cfquery>
+        <cfreturn local.userDetails>
+    </cffunction>
+
+    <!--- EDIT USER --->
+    <cffunction  name="editUser" returntype="boolean">
+        <cfargument  name="userId" type="numeric">
+        <cfargument  name="firstName" type="string">
+        <cfargument  name="lastName" type="string">
+        <cfargument  name="email" type="string">
+        <cfargument  name="phone" type="string">
+        <cfset local.emailExists = getUserDetails(
+            userId = arguments.userId
+        )>
+        <cfif queryRecordCount(local.emailExists) AND local.emailExists.fldUser_ID NEQ arguments.userId>
+            <cfreturn false>
+        <cfelse>
+            <cfquery name="local.editUser">
+                UPDATE
+                    tblUser
+                SET
+                    fldFirstName = <cfqueryparam value="#arguments.firstName#" cfsqltype="varchar">,
+                    fldLastName = <cfqueryparam value="#arguments.lastName#" cfsqltype="varchar">,
+                    fldEmail = <cfqueryparam value="#arguments.email#" cfsqltype="varchar">,
+                    fldPhone = <cfqueryparam value="#arguments.phone#" cfsqltype="varchar">
+                WHERE
+                    fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
+            </cfquery>
+        </cfif>
+        <cfreturn true>
+    </cffunction>
+
+    <!--- ADD ADDRESS --->
+    <cffunction  name="addAddress" returntype="boolean">
+        <cfargument  name="userId" required="true" type="numeric">
+        <cfargument  name="firstName" required="true" type="string">
+        <cfargument  name="lastName" required="true" type="string">
+        <cfargument  name="line1" required="true" type="string">
+        <cfargument  name="line2" required="true" type="string">
+        <cfargument  name="city" required="true" type="string">
+        <cfargument  name="state" required="true"type="string">
+        <cfargument  name="pincode" required="true" type="string">
+        <cfargument  name="phone" required="true" type="string">
+        <cfquery name="local.addAddress">
+            INSERT INTO
+                tblAddress(
+                    fldUserId,
+                    fldFirstName,
+                    fldLastName,
+                    fldAddressLine1,
+                    fldAddressLine2,
+                    fldCity,
+                    fldState,
+                    fldPincode,
+                    fldPhoneNumber
+                )VALUES(
+                    <cfqueryparam value="#arguments.userId#" cfsqltype="integer">,
+                    <cfqueryparam value="#arguments.firstName#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.lastName#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.line1#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.line2#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.city#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.state#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.pincode#" cfsqltype="varchar">,
+                    <cfqueryparam value="#arguments.phone#" cfsqltype="varchar">
+            )
+        </cfquery>
+        <cfreturn true>
+    </cffunction>
+
+    <!--- GET ADDRESS --->
+    <cffunction  name="getAddress" returntype="query">
+        <cfargument  name="userId" required="true" type="numeric">
+        <cfquery name="local.getAddress">
+            SELECT
+                fldAddress_ID,
+                fldFirstName,
+                fldLastName,
+                fldAddressLine1,
+                fldAddressLine2,
+                fldCity,
+                fldState,
+                fldPincode,
+                fldPhoneNumber
+            FROM
+                tblAddress
+            WHERE
+                fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
+                AND fldActive = 1
+        </cfquery>
+        <cfreturn local.getAddress>
+    </cffunction>
+
+    <!--- DELETE ADDRESS --->
+    <cffunction  name="deleteAddress" returntype="boolean" access="remote">
+        <cfargument  name="addressId" required="true" type="numeric">
+        <cfquery name="local.deleteAddress">
+            UPDATE
+                tblAddress
+            SET
+                fldActive = 0
+            WHERE
+                fldAddress_ID = <cfqueryparam value="#arguments.addressId#" cfsqltype="numeric">
         </cfquery>
         <cfreturn true>
     </cffunction>
