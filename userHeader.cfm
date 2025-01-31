@@ -1,5 +1,3 @@
-<!---<cfset displayCategory = application.userObject.getCategory()>
-<cfset displaySubCategory = application.userObject.getSubCategory()>--->
 <cfset variables.categoryDropdown = application.userObject.getCategory()>
 <!DOCTYPE html>
 <cfoutput>
@@ -34,32 +32,39 @@
                 </form>
             </cfif>
             <cfset pagesWithNoLogin = ["userSignUp.cfm", "userLogin.cfm"]>
-            <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
-                <div>
-                    <a href="./cart.cfm" class="cartIcon">
-                        <i class="fa-solid fa-cart-shopping text-light"></i>
-                        <cfif structKeyExists(session, "userId")>
-                            <cfset cartCount = application.userObject.displayCart()>
-                            <span class="badge" id="notificationCounter">
-                                #queryRecordCount(cartCount)#
-                            </span>
-                        </cfif>
-                    </a>
-                </div>
-            </cfif>
-            <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
-                <cfif structKeyExists(session, "userId")>
+            <div class="d-flex align-items-center headerGroup justify-content-around">
+                <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
                     <div>
-                        <button class="btn btn-primary" onclick="logout()">LOGOUT</button> 
-                    </div>
-                <cfelse>
-                    <div>
-                        <a href="./userLogin.cfm">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="##staticBackdrop">LOGIN</button> 
+                        <a href="./cart.cfm" class="cartIcon">
+                            <i class="fa-solid fa-cart-shopping text-light"></i>
+                            <cfif structKeyExists(session, "userId")>
+                                <cfset cartCount = application.userObject.displayCart()>
+                                <span class="badge" id="notificationCounter">
+                                    #queryRecordCount(cartCount)#
+                                </span>
+                            </cfif>
                         </a>
                     </div>
                 </cfif>
-            </cfif>
+                <cfif structKeyExists(session, "userId")  AND fileName NEQ "profile.cfm">
+                    <div>
+                        <a href="profile.cfm"><i class="fa-solid fa-user text-light"></i></a>
+                    </div>
+                </cfif>
+                <cfif NOT arrayFind(pagesWithNoLogin, fileName)>
+                    <cfif structKeyExists(session, "userId")>
+                        <div>
+                            <button class="btn btn-primary" onclick="logout()">LOGOUT</button> 
+                        </div>
+                    <cfelse>
+                        <div>
+                            <a href="./userLogin.cfm">
+                                <button type="button" class="btn btn-success">LOGIN</button> 
+                            </a>
+                        </div>
+                    </cfif>
+                </cfif>
+            </div>
         </div>
         <div class="categoryBar">
         <cfloop query="variables.categoryDropdown" group="fldCategory_ID">

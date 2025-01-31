@@ -12,6 +12,10 @@
     justify-content: space-between;
 }
 
+.headerGroup{
+  width: 15%;
+}
+
 .passwordInput{
     margin-right: 37px;
 }
@@ -112,7 +116,7 @@
   }
 
   .totalCard{
-    height: 200px;
+    height: 230px;
   }
 
   .cartIcon{

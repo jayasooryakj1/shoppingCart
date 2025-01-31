@@ -282,7 +282,7 @@
     </cffunction>
 
     <!--- DISPLAY CART --->
-    <cffunction  name="displayCart" returntype="query">
+    <cffunction  name="displayCart" returntype="query" access="remote">
         <cfargument  name="productId" required="false" type="numeric">
         <cfquery name="local.displayCart">
             SELECT
@@ -344,7 +344,7 @@
     </cffunction>
 
     <!--- UPDATE CART --->
-    <cffunction  name="updateCart" access="remote">
+    <cffunction  name="updateCart" access="remote" returntype="boolean">
         <cfargument  name="updateType" required="true" type="string">
         <cfargument  name="cartId" required="true" type="numeric">
         <cfquery name="local.updateCartQuery">
@@ -359,6 +359,32 @@
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
         </cfquery>
+        <cfquery name="local.checkZero">
+            SELECT 
+                fldQuantity
+            FROM
+                tblCart
+            WHERE
+                fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
+        </cfquery>
+        <cfif local.checkZero.fldQuantity EQ 0>
+            <cfset deleteCart = deleteCart(
+                cartId = arguments.cartId
+            )>
+        </cfif>
+        <cfreturn true>
+    </cffunction>
+
+    <!--- DELETE CART --->
+    <cffunction  name="deleteCart" access="remote" returntype="boolean">
+        <cfargument  name="cartId" required="true" type="numeric">
+        <cfquery name="local.deleteCart">
+            DELETE FROM
+                tblCart
+            WHERE
+                fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
+        </cfquery>
+        <cfreturn true>
     </cffunction>
 
 </cfcomponent>

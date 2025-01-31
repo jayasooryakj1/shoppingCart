@@ -113,3 +113,46 @@ function clearFilter() {
     $("#min").val("");
     $("#max").val("");
 }
+
+function updateQuantity(updateType, cartId, unitPrice) {
+    $.ajax({
+        type:"post",
+        url:"components/user.cfc?method=updateCart",
+        data:{updateType:updateType,cartId:cartId},
+        success:function () {
+            if (updateType == "+") {
+                document.getElementById("cartQuantity"+cartId).innerHTML = Number(document.getElementById("cartQuantity"+cartId).innerHTML)+1;
+                document.getElementById("total"+cartId).innerHTML = Number(document.getElementById("total"+cartId).innerHTML)+unitPrice;
+                document.getElementById("totalQuantity").innerHTML = Number(document.getElementById("totalQuantity").innerHTML)+1;
+                document.getElementById("totalActualPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) + Number(document.getElementById("price"+cartId).innerHTML)
+                document.getElementById("totalTax").innerHTML = Number(document.getElementById("totalTax").innerHTML) + Number(document.getElementById("tax"+cartId).innerHTML);
+                document.getElementById("totalPrice").innerHTML = (Number(document.getElementById("totalActualPrice").innerHTML)) + (Number(document.getElementById("totalTax").innerHTML));
+            }else{
+                document.getElementById("cartQuantity"+cartId).innerHTML = Number(document.getElementById("cartQuantity"+cartId).innerHTML)-1;
+                document.getElementById("total"+cartId).innerHTML = Number(document.getElementById("total"+cartId).innerHTML)-unitPrice;
+                document.getElementById("totalQuantity").innerHTML = Number(document.getElementById("totalQuantity").innerHTML)-1;
+                document.getElementById("totalActualPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) - Number(document.getElementById("price"+cartId).innerHTML)
+                document.getElementById("totalTax").innerHTML = Number(document.getElementById("totalTax").innerHTML) - Number(document.getElementById("tax"+cartId).innerHTML);
+                document.getElementById("totalPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) + Number(document.getElementById("totalTax").innerHTML);
+                if (document.getElementById("cartQuantity"+cartId).innerHTML == 0) {
+                    deleteCart({value:cartId})
+                }
+            }
+        }
+    })
+}
+
+function deleteCart(cartId) {
+    $.ajax({
+        type:"post",
+        url:"components/user.cfc?method=deleteCart",
+        data:{cartId:cartId.value},
+        success:function(){
+            document.getElementById("totalQuantity").innerHTML = Number(document.getElementById("totalQuantity").innerHTML) - (Number(document.getElementById("cartQuantity"+cartId.value).innerHTML));
+            document.getElementById("totalActualPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) - (Number(document.getElementById("cartQuantity"+cartId.value).innerHTML)*Number(document.getElementById("price"+cartId.value).innerHTML));
+            document.getElementById("totalTax").innerHTML = Number(document.getElementById("totalTax").innerHTML) - (Number(document.getElementById("cartQuantity"+cartId.value).innerHTML)*Number(document.getElementById("tax"+cartId.value).innerHTML));
+            document.getElementById("totalPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) + Number(document.getElementById("totalTax").innerHTML);
+            document.getElementById("itemCard"+cartId.value).remove();
+        }
+    })
+}
