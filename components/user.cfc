@@ -283,6 +283,7 @@
 
     <!--- DISPLAY CART --->
     <cffunction  name="displayCart" returntype="query" access="remote">
+        <cfargument  name="userId" required="false" type="numeric">
         <cfargument  name="productId" required="false" type="numeric">
         <cfquery name="local.displayCart">
             SELECT
@@ -389,7 +390,8 @@
 
     <!--- GET USER DETAILS --->
     <cffunction  name="getUserDetails" returntype="query">
-        <cfargument  name="userId" required="true" type="numeric">
+        <cfargument  name="userId" required="false" type="numeric">
+        <cfargument  name="email" required="false" type="string">
         <cfquery name="local.userDetails">
             SELECT
                 fldUser_ID,
@@ -400,7 +402,11 @@
             FROM
                 tbluser
             WHERE
-                fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
+                <cfif structKeyExists(arguments, "userId")>
+                    fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
+                <cfelse>
+                    fldEmail = <cfqueryparam value="#arguments.email#" cfsqltype="varchar">
+                </cfif>
         </cfquery>
         <cfreturn local.userDetails>
     </cffunction>
@@ -413,7 +419,7 @@
         <cfargument  name="email" type="string">
         <cfargument  name="phone" type="string">
         <cfset local.emailExists = getUserDetails(
-            userId = arguments.userId
+            email = arguments.email
         )>
         <cfif queryRecordCount(local.emailExists) AND local.emailExists.fldUser_ID NEQ arguments.userId>
             <cfreturn false>
@@ -429,8 +435,8 @@
                 WHERE
                     fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
             </cfquery>
+            <cfreturn true>
         </cfif>
-        <cfreturn true>
     </cffunction>
 
     <!--- ADD ADDRESS --->
@@ -506,6 +512,37 @@
                 fldAddress_ID = <cfqueryparam value="#arguments.addressId#" cfsqltype="numeric">
         </cfquery>
         <cfreturn true>
+    </cffunction>
+
+    <!--- MAKE PAYMENT --->
+    <cffunction  name="makePayment" returntype="boolean">
+        <cfargument  name="userId" required="true" type="numeric">
+        <cfargument  name="cardNumber" required="true" type="numeric">
+        <cfargument  name="cardCcv" required="true" type="numeric">
+        <cfargument  name="addressId" required="true" type="numeric">
+        <cfset local.number = 1234567890123456>
+        <cfset local.ccv = 123>
+        <cfset local.uuid = createUUID()>
+        <cfif arguments.cardNumber EQ local.number AND arguments.cardCcv EQ local.ccv>
+            <cfset local.user = getUserDetails(
+                userId = arguments.userId
+            )>
+            <cfquery name="local.checkout">
+                CALL checkout(
+                    <cfqueryparam value="#arguments.userId#" cfsqltype="integer">,
+                    <cfqueryparam value="#arguments.addressId#" cfsqltype="integer">,
+                    3456,
+                    <cfqueryparam value="#local.uuid#" cfsqltype="varchar">
+                )
+            </cfquery>
+            <cfmail  from="abc@gmail.com"  subject="Order Placed"  to="#local.user.fldEmail#"> 
+                Dear #local.user.fldFirstName#,
+                    Your order, order id: #local.uuid#, has been successfully placed
+            </cfmail>
+            <cfreturn true>
+        <cfelse>
+            <cfreturn false>
+        </cfif>
     </cffunction>
 
 </cfcomponent>

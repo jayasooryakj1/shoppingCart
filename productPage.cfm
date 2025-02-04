@@ -33,7 +33,13 @@
                     </button>
                 </div>  
                 <div class="d-flex mt-5 pt-5 justify-content-center align-items-center">
-                    <div class="w-50"><button type="button" name="buy" class="w-100 btn btn-warning">BUY</button></div>
+                    <div class="w-50">
+                        <a href="order.cfm">
+                            <button type="button" onclick="addToCart(#productDetails.fldProduct_ID#)" name="buy" class="w-100 btn btn-warning">
+                                BUY
+                            </button>
+                        </a>
+                    </div>
                     <div class="w-50"><button type="button" onclick="addToCart(#productDetails.fldProduct_ID#)" name="add" class="w-100 ms-1 btn btn-primary">ADD TO CART</button></div>
                 </div>
             </div>

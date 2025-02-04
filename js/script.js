@@ -153,6 +153,11 @@ function deleteCart(cartId) {
             document.getElementById("totalTax").innerHTML = Number(document.getElementById("totalTax").innerHTML) - (Number(document.getElementById("cartQuantity"+cartId.value).innerHTML)*Number(document.getElementById("tax"+cartId.value).innerHTML));
             document.getElementById("totalPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) + Number(document.getElementById("totalTax").innerHTML);
             document.getElementById("itemCard"+cartId.value).remove();
+            document.getElementById("notificationCounter").innerHTML = parseInt(document.getElementById("notificationCounter").innerHTML) - 1;
+            var quantity = Number(document.getElementById("totalQuantity").innerHTML);
+            if (quantity == 0) {
+                document.getElementById("paymentButton").remove();
+            }
         }
     })
 }

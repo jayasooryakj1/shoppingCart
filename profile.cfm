@@ -42,6 +42,11 @@
                     <div>   
                         email: #variables.userDetails.fldEmail#
                     </div>
+                    <cfif structKeyExists(variables, "updateUser") AND NOT variables.updateUser>
+                        <div class="text-danger">
+                            Email already exists
+                        </div>
+                    </cfif>
                 </div>
                 <div>
                     <button type="button" class="btn p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop2">
@@ -49,10 +54,9 @@
                     </button>
                 </div>
             </div>
-            <button type="button" class="btn btn-outline-primary m-2 p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop">
-                ADD ADDRESS +
-            </button>
-
+                <button type="button" class="btn btn-outline-primary m-2 p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop">
+                    ADD ADDRESS +
+                </button>
             <cfloop query="variables.address">
                 <div class="border w-75 mt-3 mb-3 p-3 d-flex" id="address#variables.address.fldAddress_ID#">
                     <div class="w-25 d-flex justify-content-center">
@@ -84,15 +88,22 @@
                     </div>
                         <div class="modal-body d-flex flex-column align-items-center justify-content-center">
                             <div>
+                                First Name
                                 <input type="text" name="firstName" value="#userDetails.fldFirstName#" placeholder="FIRST NAME" class="form-control mb-2">
                             </div>
+                            <br>
                             <div>
+                                Last Name
                                 <input type="text" name="lastName" value="#userDetails.fldLastName#" placeholder="LAST NAME" class="form-control mb-2">
                             </div>
+                            <br>
                             <div>
+                                Email
                                 <input type="text" name="email" value="#userDetails.fldEmail#" placeholder="EMAIL" class="form-control mb-2">
                             </div>
+                            <br>
                             <div>
+                                Phone Number
                                 <input type="text" name="phone" value="#userDetails.fldPhone#" placeholder="PHONE NUMBER" class="form-control mb-2">
                             </div>
                         </div>
