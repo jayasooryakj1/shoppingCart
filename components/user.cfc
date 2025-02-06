@@ -587,4 +587,49 @@
         </cfif>
     </cffunction>
 
+    <!--- GET HISTORY --->
+    <cffunction  name="getHistory" returntype="query">
+        <cfargument  name="userId" required="true" type="integer">
+        <cfargument  name="orderId" required="false" type="string">
+        <cfargument  name="searchOrderId" required="false" type="string">
+        <cfquery name="local.historyDetails">
+            SELECT
+                fldOrder_ID,
+                OI.fldProductId,
+                fldTotalPrice,
+                fldTotalTax,
+                fldOrderDate,
+                fldProductName,
+                fldImageFileName,
+                fldUnitPrice,
+                fldUnitTax,
+                OI.fldQuantity,
+                fldBrand_ID,
+                fldBrandName,
+                fldFirstName,
+                fldLastName,
+                fldAddressLine1,
+                fldAddressLine2,
+                fldCity,
+                fldState,
+                fldPincode,
+                fldPhoneNumber
+            FROM
+                tblProduct AS P
+            LEFT JOIN tblOrderItems AS OI ON P.fldProduct_ID = OI.fldProductId
+            LEFT JOIN tblOrder AS O ON OI.fldOrderId = O.fldOrder_ID
+            LEFT JOIN tblProductImages AS PI ON PI.fldProductId = P.fldProduct_ID AND PI.fldDefaultImage = 1
+            LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
+            LEFT JOIN tblAddress AS A ON O.fldAddressId = A.fldAddress_ID
+            WHERE
+                O.fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
+            <cfif structKeyExists(arguments, "orderId")>
+                AND O.fldOrder_ID = <cfqueryparam value="#arguments.orderId#">
+            <cfelseif structKeyExists(arguments, "searchOrderId")>
+                AND O.fldOrder_ID LIKE <cfqueryparam value="%#arguments.searchOrderId#%" cfsqltype="varchar">
+            </cfif>
+        </cfquery>
+        <cfreturn local.historyDetails>
+    </cffunction>
+
 </cfcomponent>

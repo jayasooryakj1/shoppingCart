@@ -39,9 +39,20 @@
                     </button>
                 </div>
             </div>
-                <button type="button" class="btn btn-outline-primary m-2 p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop">
-                    ADD ADDRESS +
-                </button>
+                <div class="d-flex w-50 align-items-center justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-outline-primary m-2 p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop">
+                            ADD ADDRESS +
+                        </button>
+                    </div>
+                    <div>
+                        <a href="orderHistory.cfm">
+                            <button type="button" class="btn btn-outline-success m-2 p-2">
+                                ORDER HISTORY
+                            </button>
+                        </a>
+                    </div>
+                </div>
             <cfloop query="variables.address">
                 <div class="border w-75 mt-3 mb-3 p-3 d-flex" id="address#variables.address.fldAddress_ID#">
                     <div class="w-25 d-flex justify-content-center">
