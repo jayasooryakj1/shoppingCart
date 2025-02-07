@@ -97,12 +97,12 @@
         <cfelseif queryRecordCount(variables.subCategoryProducts) AND structKeyExists(url, "search")>
             <h4 class="mt-5 ms-3">SEARCH RESULTS FOR "#url.search#" </h4>
         </cfif>
-        <cfset productIds = []>
+        <cfset excludedProductIds = []>
         <div class="d-flex listProducts" id="parentDiv">
             <cfif queryRecordCount(variables.subCategoryProducts) AND len(valueArray(variables.subCategoryProducts, "fldProduct_Id")[1])>
                 <cfif structKeyExists(url, "search")>
                     <cfloop query="variables.subCategoryProducts">
-                        <cfset  arrayAppend(productIds, variables.subCategoryProducts.fldProduct_ID)>
+                        <cfset  arrayAppend(excludedProductIds, variables.subCategoryProducts.fldProduct_ID)>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-5 me-5 border p-2 rounded">
                             <a href="productPage.cfm?productId=#variables.subCategoryProducts.fldProduct_ID#">
                                 <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
@@ -120,7 +120,7 @@
                     </cfloop>
                 <cfelse>
                     <cfloop query="variables.subCategoryProducts">
-                        <cfset  arrayAppend(productIds, variables.subCategoryProducts.fldProduct_ID)>
+                        <cfset  arrayAppend(excludedProductIds, variables.subCategoryProducts.fldProduct_ID)>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-5 me-5 border p-2 rounded">
                             <a href="productPage.cfm?productId=#variables.subCategoryProducts.fldProduct_ID#">
                                 <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
@@ -151,7 +151,7 @@
             <div class="d-flex align-items-center justify-content-center">
                 <div>
                     <button id="showMore" class="btn btn-outline-primary p-1" 
-                        onclick="showMore('#arraytoList(productIds)#',
+                        onclick="showMore('#arraytoList(excludedProductIds)#',
                             #variables.subCategoryId#
                             <cfif structKeyExists(form, "ascending")>,'ASC'</cfif>
                             <cfif structKeyExists(form, "descending")>,'DESC'</cfif>

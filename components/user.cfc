@@ -47,7 +47,7 @@
 
     <!--- LOGIN --->
     <cffunction  name="userLogin" returntype="boolean">
-        <cfargument  name="userName" required="true" type="string">
+        <cfargument  name="emailOrPhoneNumber" required="true" type="string">
         <cfargument  name="password" required="true" type="string">
         <cfquery name="local.userValidation">
             SELECT
@@ -57,8 +57,8 @@
             FROM
                 tblUser
             WHERE
-                (fldEmail = <cfqueryparam value="#arguments.userName#" cfsqltype="varchar"> 
-                OR fldPhone = <cfqueryparam value="#arguments.userName#" cfsqltype="varchar">
+                (fldEmail = <cfqueryparam value="#arguments.emailOrPhoneNumber#" cfsqltype="varchar"> 
+                OR fldPhone = <cfqueryparam value="#arguments.emailOrPhoneNumber#" cfsqltype="varchar">
                 )
                 AND fldActive = 1
         </cfquery>
@@ -97,8 +97,7 @@
             LEFT JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
             LEFT JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
-            LEFT JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID
-            AND P.fldActive = 1
+            LEFT JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID AND P.fldActive = 1
             WHERE
                 P.fldActive = 1
                 AND S.fldActive = 1
@@ -133,7 +132,7 @@
         <cfargument  name="search" required="false" type="string">
         <cfargument  name="categoryId" required="false" type="integer">
         <cfargument  name="subCategoryId" required="false" type="integer">
-        <cfargument  name="productIds" required="false" type="string">
+        <cfargument  name="excludedProductIds" required="false" type="string">
         <cfargument  name="sort" required="false" type="string">
         <cfargument  name="productId" required="false" type="integer">
         <cfargument  name="range" required="false" type="string">
@@ -176,8 +175,8 @@
                 </cfif>
 
                 <!--- EXCLUDE  PRODUCTS --->
-                <cfif structKeyExists(arguments, "productIds")>
-                    AND P.fldProduct_ID NOT IN (<cfqueryparam value="#arguments.productIds#" cfsqltype="integer" list="true">)
+                <cfif structKeyExists(arguments, "excludedProductIds")>
+                    AND P.fldProduct_ID NOT IN (<cfqueryparam value="#arguments.excludedProductIds#" cfsqltype="integer" list="true">)
                 </cfif>
 
                 <cfif structKeyExists(arguments, "categoryId")>
@@ -221,7 +220,6 @@
     <cffunction  name="getProductsCount" returntype="query" access="remote" returnformat="json">
         <cfargument  name="search" required="false" type="string">
         <cfargument  name="subCategoryId" required="false" type="integer">
-        <cfargument  name="sort" required="false" type="string">
         <cfif structKeyExists(arguments, "range")>
             <cfset local.range = deserializeJSON(arguments.range)>
         </cfif>
@@ -247,15 +245,6 @@
                         OR B.fldBrandName LIKE <cfqueryparam value="%#arguments.search#%" cfsqltype="varchar">
                         OR P.fldDescription LIKE <cfqueryparam value="%#arguments.search#%" cfsqltype="varchar">
                     )
-                </cfif>
-
-                <!--- SORT --->
-                <cfif structKeyExists(arguments, "sort")>
-                    <cfif arguments.sort EQ "ASC">
-                        ORDER BY (fldPrice + fldTax) ASC
-                    <cfelse>
-                        ORDER BY (fldPrice + fldTax) DESC
-                    </cfif>
                 </cfif>
         </cfquery>
         <cfreturn local.getProducts>
@@ -404,7 +393,8 @@
             WHERE
                 <cfif structKeyExists(arguments, "userId")>
                     fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
-                <cfelse>
+                </cfif>
+                <cfif structKeyExists(arguments, "email")>
                     fldEmail = <cfqueryparam value="#arguments.email#" cfsqltype="varchar">
                 </cfif>
         </cfquery>
@@ -478,9 +468,9 @@
     </cffunction>
 
     <!--- GET ADDRESS --->
-    <cffunction  name="getAddress" returntype="query">
+    <cffunction  name="getAddresses" returntype="query">
         <cfargument  name="userId" required="true" type="numeric">
-        <cfquery name="local.getAddress">
+        <cfquery name="local.getAddresses">
             SELECT
                 fldAddress_ID,
                 fldFirstName,
@@ -497,7 +487,7 @@
                 fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
                 AND fldActive = 1
         </cfquery>
-        <cfreturn local.getAddress>
+        <cfreturn local.getAddresses>
     </cffunction>
 
     <!--- DELETE ADDRESS --->

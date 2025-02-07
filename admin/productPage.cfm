@@ -83,7 +83,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#productDisplay.fldProduct_ID#"
-                                    onclick="autoPopulateProduct({categoryId:#url.categoryId#,subCategoryId:#productDisplay.fldSubCategoryId#,productName:'#productDisplay.fldProductName#',productBrand:#productDisplay.fldBrandId#,productDescription:'#productDisplay.fldDescription#',productPrice:#productDisplay.fldPrice#,productTax:#productDisplay.fldTax#,productId:#productDisplay.fldProduct_ID#})">
+                                    onclick="autoPopulateProduct({categoryId:#productDisplay.fldCategoryId#,subCategoryId:#productDisplay.fldSubCategoryId#,productName:'#productDisplay.fldProductName#',productBrand:#productDisplay.fldBrandId#,productDescription:'#productDisplay.fldDescription#',productPrice:#productDisplay.fldPrice#,productTax:#productDisplay.fldTax#,productId:#productDisplay.fldProduct_ID#})">
                                         Edit
                                     </button>
                                 </td>

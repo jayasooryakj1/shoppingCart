@@ -12,7 +12,7 @@
     )>
 </cfif>
 
-<cfset variables.address = application.userObject.getAddress(
+<cfset variables.address = application.userObject.getAddresses(
     userId = session.userId
 )>
 

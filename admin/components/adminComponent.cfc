@@ -272,6 +272,7 @@
                 fldProductName,
                 fldSubCategoryId,
                 fldPrice,
+                fldCategoryId,
                 fldTax,
                 fldBrandName,
                 fldBrandId,
@@ -283,6 +284,14 @@
                 tblBrands
             ON
                 tblProduct.fldBrandId = tblBrands.fldBrand_ID
+            LEFT JOIN
+                tblSubCategory
+            ON
+                tblSubCategory.fldSubCategory_ID = tblProduct.fldSubCategoryId
+            LEFT JOIN
+                tblCategory
+            ON
+                tblCategory.fldCategory_ID = tblSubCategory.fldCategoryId
             LEFT JOIN
                 tblProductImages
             ON

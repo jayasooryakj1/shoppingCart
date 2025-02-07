@@ -60,11 +60,11 @@ function filter(subCategoryId) {
     }
 }
 
-function showMore(productIds, subCategoryId,sort){
+function showMore(excludedProductIds, subCategoryId,sort){
     $.ajax({
         type:"post",
         url:"components/user.cfc?method=getProducts",
-        data:{productIds:productIds,subCategoryId:subCategoryId,sort:sort},
+        data:{excludedProductIds:excludedProductIds,subCategoryId:subCategoryId,sort:sort},
         success:function (result) {
             var filterQuery = JSON.parse(result);
                 let productItem 
