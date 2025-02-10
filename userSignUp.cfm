@@ -1,11 +1,20 @@
 <cfif structKeyExists(form, "submit")>
-    <cfset result = application.userObject.userSignUp(
+    <cfset variables.result = application.userObject.userSignUp(
         firstName = form.firstName,
         lastName = form.lastName,
         email = form.email,
         phoneNumber = form.phoneNumber,
         password = form.password
     )>
+    <cfif structKeyExists(variables, "result") AND variables.result>
+        <div>
+            Email already Exists
+        </div>
+    <cfelse>
+        <div>
+            User added
+        </div>
+    </cfif>
 </cfif>
     
 <cfinclude  template="./userHeader.cfm">
@@ -42,15 +51,9 @@
                 </div>
             </div>
         </form>
-        <cfif structKeyExists(variables, "result") AND NOT result>
-            <div>
-                Email already Exists
-            </div>
-        <cfelse>
-            <div>
-                User added
-            </div>
-        </cfif>
+        <div>
+            <a href="./userLogin.cfm">LOGIN</a>
+        </div>
     </div>
 
 <cfinclude  template="./userFooter.cfm">
