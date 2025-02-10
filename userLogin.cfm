@@ -8,7 +8,7 @@
             <cfset addItemToCart = application.userObject.addToCart(
                 productId = url.productId
             )>
-            <cflocation  url="./productPage.cfm?productId=#url.productId#">
+            <cflocation  url="./productPage.cfm?productId=#url.productId#&added=true">
         <cfelse>
             <cflocation  url="index.cfm">
         </cfif>

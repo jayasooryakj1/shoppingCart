@@ -1,15 +1,5 @@
-<cfif structKeyExists(form, "editUser")>
-    <cfset variables.updateUser = application.userObject.editUser(
-        userId = session.userId,
-        firstName = form.firstName,
-        lastName = form.lastName,
-        email = form.email,
-        phone = form.phone
-    )>
-</cfif>
-
 <cfif structKeyExists(form, "addAddress")>
-    <cfset variables.addAddress = application.userObject.addAddress(
+    <cfset variables.addAddress = application.userObject.addAddresses(
         userId = session.userId,
         firstName = form.addressFirstName,
         lastName = form.addresslastName,
@@ -22,7 +12,7 @@
     )>
 </cfif>
 
-<cfset variables.address = application.userObject.getAddress(
+<cfset variables.address = application.userObject.getAddresses(
     userId = session.userId
 )>
 
@@ -37,16 +27,11 @@
             <div class="border w-75 d-flex justify-content-center align-items-center p-4 m-3">
                 <div class="d-flex w-25 flex-column justify-content-center align-items-center">
                     <div>
-                        <h4>#variables.userDetails.fldFirstName#</h4>
+                        <h4 id="profileUserName">#variables.userDetails.fldFirstName#</h4>
                     </div>
                     <div>   
-                        email: #variables.userDetails.fldEmail#
+                        email: <span id="profileUserMailId">#variables.userDetails.fldEmail#</span>
                     </div>
-                    <cfif structKeyExists(variables, "updateUser") AND NOT variables.updateUser>
-                        <div class="text-danger">
-                            Email already exists
-                        </div>
-                    </cfif>
                 </div>
                 <div>
                     <button type="button" class="btn p-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop2">
@@ -78,37 +63,41 @@
         </div>
 
         <!--- EDIT USER PROFILE MODAL --->
-        <form method="post">
+        <form method="post"
+            onsubmit="return editUser(#session.userId#)" 
+        >
             <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">EDIT USER DETAILS</h5>
-                        <button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                         <div class="modal-body d-flex flex-column align-items-center justify-content-center">
                             <div>
                                 First Name
-                                <input type="text" name="firstName" value="#userDetails.fldFirstName#" placeholder="FIRST NAME" class="form-control mb-2">
+                                <input type="text" id="modalFirstName" name="firstName" value="#userDetails.fldFirstName#" placeholder="FIRST NAME" class="form-control mb-2">
                             </div>
                             <br>
                             <div>
                                 Last Name
-                                <input type="text" name="lastName" value="#userDetails.fldLastName#" placeholder="LAST NAME" class="form-control mb-2">
+                                <input type="text" id="modalLastName" name="lastName" value="#userDetails.fldLastName#" placeholder="LAST NAME" class="form-control mb-2">
                             </div>
                             <br>
                             <div>
                                 Email
-                                <input type="text" name="email" value="#userDetails.fldEmail#" placeholder="EMAIL" class="form-control mb-2">
+                                <input type="text" id="modalEmail" name="email" value="#userDetails.fldEmail#" placeholder="EMAIL" class="form-control mb-2">
                             </div>
                             <br>
                             <div>
                                 Phone Number
-                                <input type="text" name="phone" value="#userDetails.fldPhone#" placeholder="PHONE NUMBER" class="form-control mb-2">
+                                <input type="number" id="modalPhone" name="phone" value="#userDetails.fldPhone#" placeholder="PHONE NUMBER" class="form-control mb-2">
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" name="editUser" class="btn btn-primary">SUBMIT</button>
+                            <button type="submit" name="editUserButton" class="btn btn-primary">
+                                SUBMIT
+                            </button>
                         </div>     
                     </div>
                 </div>

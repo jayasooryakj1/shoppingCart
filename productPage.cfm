@@ -58,8 +58,14 @@
                     #productDetails.fldDescription#
                 </div>
                 <br>
-                <div id="response" class="res">
-                </div>
+                <cfif structKeyExists(url, "added")>
+                    <div id="response" class="res">
+                        Item added to cart
+                    </div>
+                <cfelse>
+                    <div id="response" class="res">
+                    </div>
+                </cfif>
             </div>
         </div>
     </cfoutput>

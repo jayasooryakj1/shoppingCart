@@ -94,10 +94,10 @@
                 fldBrandName
             FROM
                 tblProduct AS P
-            LEFT JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
-            LEFT JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
+            INNER JOIN tblSubCategory AS S ON P.fldSubCategoryId = S.fldSubCategory_ID
+            INNER JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId
+            INNER JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID AND B.fldActive = 1
             LEFT JOIN tblProductImages AS I ON P.fldProduct_ID = I.fldProductId
-            LEFT JOIN tblBrands AS B ON P.fldbrandId = B.fldBrand_ID AND P.fldActive = 1
             WHERE
                 P.fldActive = 1
                 AND S.fldActive = 1
@@ -127,6 +127,18 @@
         <cfreturn local.getProductImages>
     </cffunction>
 
+    <!--- GET PRODUCTS AS JSON --->
+    <cffunction  name="getProductsAsJson" returnType="json">
+        <cfargument  name="subCategoryId" required="true" type="integer">
+        <cfargument  name="priceFrom" required="false" type="integer">
+        <cfargument  name="priceTo" required="false" type="integer">
+        <cfset local.userDetailsQuery = getUserDetails(
+            subCategoryId = arguments.subCategoryId,
+            priceFrom = arguments.priceFrom,
+            priceTo = arguments.priceTo
+        )>
+    </cffunction>
+
     <!--- GET PRODUCTS --->
     <cffunction  name="getProducts" returntype="query" access="remote" returnformat="json">
         <cfargument  name="search" required="false" type="string">
@@ -135,11 +147,9 @@
         <cfargument  name="excludedProductIds" required="false" type="string">
         <cfargument  name="sort" required="false" type="string">
         <cfargument  name="productId" required="false" type="integer">
-        <cfargument  name="range" required="false" type="string">
+        <cfargument  name="priceFrom" required="false" type="integer">
+        <cfargument  name="priceTo" required="false" type="integer">
         <cfargument  name="limit" required="false" type="integer">
-        <cfif structKeyExists(arguments, "range")>
-            <cfset local.range = deserializeJSON(arguments.range)>
-        </cfif>
         <cfquery name="local.getProducts">
             SELECT
                 fldProduct_ID,
@@ -169,9 +179,9 @@
                 </cfif>
 
                 <!--- FILTER --->
-                <cfif structKeyExists(arguments, "range") AND (val(local.range[1]) OR val(local.range[2]))>
-                    AND (fldPrice + fldTax) > <cfqueryparam value="#local.range[1]#" cfsqltype="numeric">
-                    AND (fldPrice + fldTax) < <cfqueryparam value="#local.range[2]#" cfsqltype="numeric">
+                <cfif structKeyExists(arguments, "priceFrom") AND structKeyExists(arguments, "priceTo") AND #arguments.priceTo# GT 0>
+                    AND (fldPrice + fldTax) > <cfqueryparam value="#arguments.priceFrom#" cfsqltype="numeric">
+                    AND (fldPrice + fldTax) < <cfqueryparam value="#arguments.priceTo#" cfsqltype="numeric">
                 </cfif>
 
                 <!--- EXCLUDE  PRODUCTS --->
@@ -220,9 +230,6 @@
     <cffunction  name="getProductsCount" returntype="query" access="remote" returnformat="json">
         <cfargument  name="search" required="false" type="string">
         <cfargument  name="subCategoryId" required="false" type="integer">
-        <cfif structKeyExists(arguments, "range")>
-            <cfset local.range = deserializeJSON(arguments.range)>
-        </cfif>
         <cfquery name="local.getProducts">
             SELECT
                 COUNT(*) AS count
@@ -273,7 +280,6 @@
     <!--- DISPLAY CART --->
     <cffunction  name="displayCart" returntype="query" access="remote">
         <cfargument  name="userId" required="false" type="numeric">
-        <cfargument  name="productId" required="false" type="numeric">
         <cfquery name="local.displayCart">
             SELECT
                 fldCart_ID,
@@ -302,9 +308,15 @@
     <cffunction  name="addToCart" returntype="struct" returnformat="JSON" access="remote">
         <cfargument  name="productId" required="true" type="numeric">
         <cfif structKeyExists(session, "userId")>
-            <cfset local.productInCart = displayCart(
-                productId = arguments.productId
-            )>
+            <cfquery name="local.productInCart">
+                SELECT
+                    fldProductId,
+                    fldCart_ID
+                FROM
+                    tblCart
+                WHERE
+                    fldproductId = <cfqueryparam value="#arguments.productId#">
+            </cfquery>
             <cfif queryRecordCount(local.productInCart)>
                 <cfset local.updateCart = updateCart(
                     updateType="+",
@@ -326,7 +338,14 @@
                     )
                 </cfquery>
             </cfif>
+            <cfquery name="cartCount">
+                SELECT
+                    COUNT(*) as count
+                FROM
+                    tblCart
+            </cfquery>
             <cfset local.resultStruct["success"]=true>
+            <cfset local.resultStruct["count"] = cartCount.count>
         <cfelse>
             <cfset local.resultStruct["redirect"]=true>
         </cfif>
@@ -334,21 +353,10 @@
     </cffunction>
 
     <!--- UPDATE CART --->
-    <cffunction  name="updateCart" access="remote" returntype="boolean">
+    <cffunction  name="updateCart" access="remote" returntype="struct" returnformat="JSON">
         <cfargument  name="updateType" required="true" type="string">
         <cfargument  name="cartId" required="true" type="numeric">
-        <cfquery name="local.updateCartQuery">
-            UPDATE
-                tblCart
-            SET
-                <cfif arguments.updateType EQ "-">
-                    fldQuantity = fldQuantity - 1
-                <cfelse>
-                    fldQuantity = fldQuantity + 1
-                </cfif>
-            WHERE
-                fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
-        </cfquery>
+        <cfset local.updateResult = {}>
         <cfquery name="local.checkZero">
             SELECT 
                 fldQuantity
@@ -357,24 +365,47 @@
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
         </cfquery>
-        <cfif local.checkZero.fldQuantity EQ 0>
+        <cfif arguments.updateType EQ "-" AND local.checkZero.fldQuantity EQ 1>
             <cfset deleteCart = deleteCart(
                 cartId = arguments.cartId
             )>
+        <cfelse>
+            <cfquery name="local.updateCartQuery">
+                UPDATE
+                    tblCart
+                SET
+                    <cfif arguments.updateType EQ "-">
+                        fldQuantity = fldQuantity - 1
+                    <cfelse>
+                        fldQuantity = fldQuantity + 1
+                    </cfif>
+                WHERE
+                    fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
+            </cfquery>
         </cfif>
-        <cfreturn true>
+        <cfset local.UpdateResult["result"] = true>
+        <cfreturn local.UpdateResult>
     </cffunction>
 
     <!--- DELETE CART --->
-    <cffunction  name="deleteCart" access="remote" returntype="boolean">
+    <cffunction  name="deleteCart" access="remote" returntype="struct" returnformat="JSON">
         <cfargument  name="cartId" required="true" type="numeric">
+        <cfset local.deleteCartResult = {}>
         <cfquery name="local.deleteCart">
             DELETE FROM
                 tblCart
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
         </cfquery>
-        <cfreturn true>
+        <cfquery name="local.getCount">
+            SELECT
+                COUNT(*) as count
+            FROM
+                tblCart
+        </cfquery>
+        <cfset local.deleteCartResult["count"] = local.getCount.count>
+        <cfset local.deleteCartResult["success"] = true>
+        <cfreturn local.deleteCartResult>
     </cffunction>
 
     <!--- GET USER DETAILS --->
@@ -402,17 +433,18 @@
     </cffunction>
 
     <!--- EDIT USER --->
-    <cffunction  name="editUser" returntype="boolean">
-        <cfargument  name="userId" type="numeric">
-        <cfargument  name="firstName" type="string">
-        <cfargument  name="lastName" type="string">
-        <cfargument  name="email" type="string">
-        <cfargument  name="phone" type="string">
+    <cffunction  name="editUser" returntype="struct" access="remote" returnformat="json">
+        <cfargument  name="userId" required="true" type="numeric">
+        <cfargument  name="firstName" required="true" type="string">
+        <cfargument  name="lastName" required="true" type="string">
+        <cfargument  name="email" required="true" type="string">
+        <cfargument  name="phone" required="true" type="string">
+        <cfset local.editUserResult = {}>
         <cfset local.emailExists = getUserDetails(
             email = arguments.email
         )>
         <cfif queryRecordCount(local.emailExists) AND local.emailExists.fldUser_ID NEQ arguments.userId>
-            <cfreturn false>
+            <cfset local.editUserResult["error"] = "Email already exists">
         <cfelse>
             <cfquery name="local.editUser">
                 UPDATE
@@ -425,12 +457,17 @@
                 WHERE
                     fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
             </cfquery>
-            <cfreturn true>
+            <cfset local.editUserResult["success"] = "User edited">
+            <cfset local.editUserResult["email"] = arguments.email>
+            <cfset local.editUserResult["firstName"] = arguments.firstName>
+            <cfset local.editUserResult["lastName"] = arguments.lastName>
+            <cfset local.editUserResult["phoneNumber"] = arguments.phone>
         </cfif>
+        <cfreturn local.editUserResult>
     </cffunction>
 
     <!--- ADD ADDRESS --->
-    <cffunction  name="addAddress" returntype="boolean">
+    <cffunction  name="addAddresses" returntype="boolean">
         <cfargument  name="userId" required="true" type="numeric">
         <cfargument  name="firstName" required="true" type="string">
         <cfargument  name="lastName" required="true" type="string">
@@ -491,8 +528,9 @@
     </cffunction>
 
     <!--- DELETE ADDRESS --->
-    <cffunction  name="deleteAddress" returntype="boolean" access="remote">
+    <cffunction  name="deleteAddress" returntype="struct" returnformat="JSON" access="remote">
         <cfargument  name="addressId" required="true" type="numeric">
+        <cfset local.deleteAddressResult = {}>
         <cfquery name="local.deleteAddress">
             UPDATE
                 tblAddress
@@ -501,37 +539,51 @@
             WHERE
                 fldAddress_ID = <cfqueryparam value="#arguments.addressId#" cfsqltype="numeric">
         </cfquery>
-        <cfreturn true>
+        <cfset local.deleteAddressResult["success"] = true>
+        <cfreturn local.deleteAddressResult>
     </cffunction>
 
     <!--- MAKE PAYMENT --->
-    <cffunction  name="makePayment" returntype="boolean">
+    <cffunction  name="makePayment" returntype="struct">
         <cfargument  name="userId" required="true" type="numeric">
         <cfargument  name="cardNumber" required="true" type="numeric">
-        <cfargument  name="cardCcv" required="true" type="numeric">
+        <cfargument  name="cardCvv" required="true" type="numeric">
         <cfargument  name="addressId" required="true" type="numeric">
+        <cfset local.paymentStruct = {}>
         <cfset local.number = 1234567890123456>
-        <cfset local.ccv = 123>
+        <cfset local.cvv = 123>
         <cfset local.uuid = createUUID()>
-        <cfif arguments.cardNumber EQ local.number AND arguments.cardCcv EQ local.ccv>
+        <cfif arguments.cardNumber EQ local.number AND arguments.cardCvv EQ local.cvv>
             <cfset local.user = getUserDetails(
                 userId = arguments.userId
             )>
-            <cfquery name="local.checkout">
+            <!---<cfquery name="local.checkout">
                 CALL checkout(
                     <cfqueryparam value="#arguments.userId#" cfsqltype="integer">,
                     <cfqueryparam value="#arguments.addressId#" cfsqltype="integer">,
                     3456,
                     <cfqueryparam value="#local.uuid#" cfsqltype="varchar">
                 )
-            </cfquery>
-            <cfmail  from="abc@gmail.com"  subject="Order Placed"  to="#local.user.fldEmail#"> 
-                Dear #local.user.fldFirstName#,
+            </cfquery>--->
+
+            <cfstoredproc procedure="checkout">
+                <cfprocparam type="in" value="#arguments.userId#" cfsqltype="integer">
+                <cfprocparam type="in" value="#arguments.addressId#" cfsqltype="integer">
+                <cfprocparam type="in" value="3456" cfsqltype="integer">
+                <cfprocparam type="in" value="#local.uuid#" cfsqltype="varchar">
+                <cfprocparam type="out" variable="local.email" cfsqltype="varchar">
+                <cfprocparam type="out" variable="local.firstName" cfsqltype="varchar">
+            </cfstoredproc>
+
+            <cfmail  from="abc@gmail.com"  subject="Order Placed"  to="#local.email#"> 
+                Dear #local.firstName#,
                     Your order, order id: #local.uuid#, has been successfully placed
             </cfmail>
-            <cfreturn true>
+            <cfset local.paymentStruct.success = true>
+            <cfreturn local.paymentStruct>
         <cfelse>
-            <cfreturn false>
+            <cfset local.paymentStruct.error = "Payment Credentials mismatch">
+            <cfreturn local.paymentStruct>
         </cfif>
     </cffunction>
 

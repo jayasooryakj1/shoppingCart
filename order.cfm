@@ -24,7 +24,7 @@
     <cfset variables.payment = application.userObject.makePayment(
         userId = session.userId,
         cardNumber = form.cardNumber,
-        cardCcv = form.cardCcv,
+        cardCvv = form.cardCvv,
         addressId = form.selectedAddress
     )>
 </cfif>
@@ -34,6 +34,15 @@
 
     <cfoutput>
         <cfif queryRecordCount(variables.orderSummary)>
+            <cfif structKeyExists(variables, "payment")>
+                <cfif structKeyExists(variables.payment, "success")>
+                        <cflocation  url="orderHistory.cfm">
+                <cfelse>
+                    <div class="text-danger ms-5">
+                        <H4>#variables.payment.error#</H4>
+                    </div>
+                </cfif>
+            </cfif>
             <form method="post">
                 <div class="d-flex">
                     <div class="accordion w-75" id="accordionExample">
@@ -140,7 +149,7 @@
                                                 CARD NUMBER <input name="cardNumber" type="numeric" title="input 16 digit card number" maxlength="16" pattern="[0-9]{16}" required> 
                                             </div>
                                             <div>
-                                                CVV <input name="cardCcv" type="password" title="enter 3 digit cvv" maxlength="3" pattern="[0-9]{3}" inputmode="numeric" required>
+                                                CVV <input name="cardCvv" type="password" title="enter 3 digit cvv" maxlength="3" pattern="[0-9]{3}" inputmode="numeric" required>
                                             </div>
                                         </div>
                                     </div>
@@ -154,15 +163,6 @@
                                         <div class="text-danger">
                                             ADD AN ADDRESS TO CONTINUE PAYMENT
                                         </div>
-                                    </cfif>
-                                    <cfif structKeyExists(variables, "payment")>
-                                        <cfif variables.payment>
-                                                <cflocation  url="orderHistory.cfm">
-                                        <cfelse>
-                                            <div class="text-danger ms-5">
-                                                Payment Credentials mismatch
-                                            </div>
-                                        </cfif>
                                     </cfif>
                                 </div>
                             </div>
