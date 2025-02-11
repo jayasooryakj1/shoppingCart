@@ -1,16 +1,11 @@
-<cfset variables.orderDetails = application.userObject.getHistory(
-    userId = session.userId
-)>
-
 <cfif structKeyExists(form, "searchHistory")>
     <cfset variables.orderDetails = application.userObject.getHistory(
         userId = session.userId,
         searchOrderId = form.searchOrderId
     )>
-<cfelseif structKeyExists(form, "clearSearch")>
+<cfelse>
     <cfset variables.orderDetails = application.userObject.getHistory(
-        userId = session.userId,
-        searchOrderId = ""
+        userId = session.userId
     )>
 </cfif>
 
@@ -30,7 +25,7 @@
                     </div>
                 </div>
             </form>
-            <cfif structKeyExists(form, "searchHistory") AND LEN(form.searchOrderID)>
+            <cfif structKeyExists(form, "searchHistory") AND structKeyExists(form, "searchOrderID") AND len(form.searchOrderID)>
                 <cfif queryRecordCount(variables.orderDetails)>
                     <div>
                         <h4>SEARCH RESULTS FOR "#form.searchOrderId#"</h4><br>

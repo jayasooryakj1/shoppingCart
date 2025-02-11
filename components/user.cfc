@@ -586,37 +586,37 @@
         <cfargument  name="searchOrderId" required="false" type="string">
         <cfquery name="local.historyDetails">
             SELECT
-                fldOrder_ID AS orderId,
+                O.fldOrder_ID AS orderId,
                 OI.fldProductId AS productId,
-                fldTotalPrice AS totalPrice,
-                fldTotalTax AS totalTax,
-                fldOrderDate AS orderDate,
-                fldProductName AS productName,
-                fldImageFileName AS image,
-                fldUnitPrice AS unitPrice,
-                fldUnitTax AS unitTax,
+                O.fldTotalPrice AS totalPrice,
+                O.fldTotalTax AS totalTax,
+                O.fldOrderDate AS orderDate,
+                P.fldProductName AS productName,
+                PI.fldImageFileName AS image,
+                OI.fldUnitPrice AS unitPrice,
+                OI.fldUnitTax AS unitTax,
                 OI.fldQuantity AS quantity,
-                fldBrand_ID AS brandId,
-                fldBrandName AS brandName,
-                fldFirstName AS firstName,
-                fldLastName AS lastName,
-                fldAddressLine1 AS line1,
-                fldAddressLine2 AS line2,
-                fldCity AS city,
-                fldState AS state,
-                fldPincode AS pincode,
-                fldPhoneNumber AS phone
+                B.fldBrand_ID AS brandId,
+                B.fldBrandName AS brandName,
+                A.fldFirstName AS firstName,
+                A.fldLastName AS lastName,
+                A.fldAddressLine1 AS line1,
+                A.fldAddressLine2 AS line2,
+                A.fldCity AS city,
+                A.fldState AS state,
+                A.fldPincode AS pincode,
+                A.fldPhoneNumber AS phone
             FROM
-                tblProduct AS P
-            LEFT JOIN tblOrderItems AS OI ON P.fldProduct_ID = OI.fldProductId
-            LEFT JOIN tblOrder AS O ON OI.fldOrderId = O.fldOrder_ID
-            LEFT JOIN tblProductImages AS PI ON PI.fldProductId = P.fldProduct_ID AND PI.fldDefaultImage = 1
+                tblOrder AS O
+            INNER JOIN tblOrderItems AS OI ON OI.fldOrderId = O.fldOrder_ID
+            INNER JOIN tblProduct AS P ON OI.fldProductId = P.fldProduct_ID
+            INNER JOIN tblAddress AS A ON O.fldAddressId = A.fldAddress_ID
             LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
-            LEFT JOIN tblAddress AS A ON O.fldAddressId = A.fldAddress_ID
+            LEFT JOIN tblProductImages AS PI ON PI.fldProductId = P.fldProduct_ID AND PI.fldDefaultImage = 1
             WHERE
                 O.fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
             <cfif structKeyExists(arguments, "orderId")>
-                AND O.fldOrder_ID = <cfqueryparam value="#arguments.orderId#">
+                AND O.fldOrder_ID = <cfqueryparam value="#arguments.orderId#" cfsqltype="varchar">
             <cfelseif structKeyExists(arguments, "searchOrderId")>
                 AND O.fldOrder_ID LIKE <cfqueryparam value="%#arguments.searchOrderId#%" cfsqltype="varchar">
             </cfif>

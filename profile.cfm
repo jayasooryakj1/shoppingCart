@@ -46,7 +46,7 @@
                         </button>
                     </div>
                     <div>
-                        <a href="invoice.cfm">
+                        <a href="orderHistory.cfm">
                             <button type="button" class="btn btn-outline-success m-2 p-2">
                                 ORDER HISTORY
                             </button>
