@@ -586,26 +586,26 @@
         <cfargument  name="searchOrderId" required="false" type="string">
         <cfquery name="local.historyDetails">
             SELECT
-                fldOrder_ID,
-                OI.fldProductId,
-                fldTotalPrice,
-                fldTotalTax,
-                fldOrderDate,
-                fldProductName,
-                fldImageFileName,
-                fldUnitPrice,
-                fldUnitTax,
-                OI.fldQuantity,
-                fldBrand_ID,
-                fldBrandName,
-                fldFirstName,
-                fldLastName,
-                fldAddressLine1,
-                fldAddressLine2,
-                fldCity,
-                fldState,
-                fldPincode,
-                fldPhoneNumber
+                fldOrder_ID AS orderId,
+                OI.fldProductId AS productId,
+                fldTotalPrice AS totalPrice,
+                fldTotalTax AS totalTax,
+                fldOrderDate AS orderDate,
+                fldProductName AS productName,
+                fldImageFileName AS image,
+                fldUnitPrice AS unitPrice,
+                fldUnitTax AS unitTax,
+                OI.fldQuantity AS quantity,
+                fldBrand_ID AS brandId,
+                fldBrandName AS brandName,
+                fldFirstName AS firstName,
+                fldLastName AS lastName,
+                fldAddressLine1 AS line1,
+                fldAddressLine2 AS line2,
+                fldCity AS city,
+                fldState AS state,
+                fldPincode AS pincode,
+                fldPhoneNumber AS phone
             FROM
                 tblProduct AS P
             LEFT JOIN tblOrderItems AS OI ON P.fldProduct_ID = OI.fldProductId
