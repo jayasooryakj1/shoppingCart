@@ -122,7 +122,7 @@ function updateQuantity(updateType, cartId, unitPrice) {
                     document.getElementById("totalActualPrice").innerHTML = Number(document.getElementById("totalActualPrice").innerHTML) + Number(document.getElementById("price"+cartId).innerHTML)
                     document.getElementById("totalTax").innerHTML = Number(document.getElementById("totalTax").innerHTML) + Number(document.getElementById("tax"+cartId).innerHTML);
                     document.getElementById("totalPrice").innerHTML = (Number(document.getElementById("totalActualPrice").innerHTML)) + (Number(document.getElementById("totalTax").innerHTML));
-                }else{
+                }else if (updateType == "-") {
                     document.getElementById("cartQuantity"+cartId).innerHTML = Number(document.getElementById("cartQuantity"+cartId).innerHTML)-1;
                     document.getElementById("total"+cartId).innerHTML = Number(document.getElementById("total"+cartId).innerHTML)-unitPrice;
                     document.getElementById("totalQuantity").innerHTML = Number(document.getElementById("totalQuantity").innerHTML)-1;
