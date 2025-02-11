@@ -557,14 +557,6 @@
             <cfset local.user = getUserDetails(
                 userId = arguments.userId
             )>
-            <!---<cfquery name="local.checkout">
-                CALL checkout(
-                    <cfqueryparam value="#arguments.userId#" cfsqltype="integer">,
-                    <cfqueryparam value="#arguments.addressId#" cfsqltype="integer">,
-                    3456,
-                    <cfqueryparam value="#local.uuid#" cfsqltype="varchar">
-                )
-            </cfquery>--->
 
             <cfstoredproc procedure="checkout">
                 <cfprocparam type="in" value="#arguments.userId#" cfsqltype="integer">
@@ -585,6 +577,53 @@
             <cfset local.paymentStruct.error = "Payment Credentials mismatch">
             <cfreturn local.paymentStruct>
         </cfif>
+    </cffunction>
+
+    <!--- GET HISTORY --->
+    <cffunction  name="getHistory" returntype="query">
+        <cfargument  name="userId" required="true" type="integer">
+        <cfargument  name="orderId" required="false" type="string">
+        <cfargument  name="searchOrderId" required="false" type="string">
+        <cfquery name="local.historyDetails">
+            SELECT
+                O.fldOrder_ID AS orderId,
+                OI.fldProductId AS productId,
+                O.fldTotalPrice AS totalPrice,
+                O.fldTotalTax AS totalTax,
+                O.fldOrderDate AS orderDate,
+                P.fldProductName AS productName,
+                PI.fldImageFileName AS image,
+                OI.fldUnitPrice AS unitPrice,
+                OI.fldUnitTax AS unitTax,
+                OI.fldQuantity AS quantity,
+                B.fldBrand_ID AS brandId,
+                B.fldBrandName AS brandName,
+                A.fldFirstName AS firstName,
+                A.fldLastName AS lastName,
+                A.fldAddressLine1 AS line1,
+                A.fldAddressLine2 AS line2,
+                A.fldCity AS city,
+                A.fldState AS state,
+                A.fldPincode AS pincode,
+                A.fldPhoneNumber AS phone
+            FROM
+                tblOrder AS O
+            INNER JOIN tblOrderItems AS OI ON OI.fldOrderId = O.fldOrder_ID
+            INNER JOIN tblProduct AS P ON OI.fldProductId = P.fldProduct_ID
+            INNER JOIN tblAddress AS A ON O.fldAddressId = A.fldAddress_ID
+            LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID
+            LEFT JOIN tblProductImages AS PI ON PI.fldProductId = P.fldProduct_ID AND PI.fldDefaultImage = 1
+            WHERE
+                O.fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="integer">
+            <cfif structKeyExists(arguments, "orderId")>
+                AND O.fldOrder_ID = <cfqueryparam value="#arguments.orderId#" cfsqltype="varchar">
+            <cfelseif structKeyExists(arguments, "searchOrderId")>
+                AND O.fldOrder_ID LIKE <cfqueryparam value="%#arguments.searchOrderId#%" cfsqltype="varchar">
+            </cfif>
+            ORDER BY
+                fldOrderDate DESC
+        </cfquery>
+        <cfreturn local.historyDetails>
     </cffunction>
 
 </cfcomponent>
