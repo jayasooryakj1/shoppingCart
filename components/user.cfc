@@ -557,14 +557,6 @@
             <cfset local.user = getUserDetails(
                 userId = arguments.userId
             )>
-            <!---<cfquery name="local.checkout">
-                CALL checkout(
-                    <cfqueryparam value="#arguments.userId#" cfsqltype="integer">,
-                    <cfqueryparam value="#arguments.addressId#" cfsqltype="integer">,
-                    3456,
-                    <cfqueryparam value="#local.uuid#" cfsqltype="varchar">
-                )
-            </cfquery>--->
 
             <cfstoredproc procedure="checkout">
                 <cfprocparam type="in" value="#arguments.userId#" cfsqltype="integer">
@@ -628,6 +620,8 @@
             <cfelseif structKeyExists(arguments, "searchOrderId")>
                 AND O.fldOrder_ID LIKE <cfqueryparam value="%#arguments.searchOrderId#%" cfsqltype="varchar">
             </cfif>
+            ORDER BY
+                fldOrderDate DESC
         </cfquery>
         <cfreturn local.historyDetails>
     </cffunction>

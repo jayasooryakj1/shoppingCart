@@ -5,7 +5,7 @@
 
     <cfoutput>
         
-        <div class="mt-5">
+        <div class="mt-1">
             <div class="d-flex randomProducts">
                 <cfloop query="variables.randomProducts">
                     <div class="mt-5 d-flex flex-column justify-content-center align-items-center ms-5 border p-2 rounded">
