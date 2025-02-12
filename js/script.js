@@ -33,18 +33,17 @@ function filter(subCategoryId) {
         success:function(result){
             $("#parentDiv").empty()
             var filterQuery = JSON.parse(result);
-            let productItem 
-            filterQuery.DATA.forEach(element => {
+            filterQuery.forEach(element => {
                 productItem = `<div class="mt-5 d-flex flex-column justify-content-center align-items-center ms-5 border p-2 rounded">
-                                    <a href="productPage.cfm?productId=${element[0]}">
+                                    <a href="productPage.cfm?productId=${element.productId}">
                                         <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
-                                            <img src="assets/productImages/${element[13]}" alt="productImage">
+                                            <img src="assets/productImages/${element.imageFileName}" alt="productImage">
                                         </div>
                                         <div>
-                                            ${element[3]}
+                                            ${element.productName}
                                         </div>
                                         <div> 
-                                            ${element[7] + element[8]}
+                                            ${element.price + element.tax}
                                         </div>
                                     </a>
                                 </div>`

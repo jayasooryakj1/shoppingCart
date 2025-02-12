@@ -128,15 +128,35 @@
     </cffunction>
 
     <!--- GET PRODUCTS AS JSON --->
-    <cffunction  name="getProductsAsJson" returnType="json">
+    <cffunction  name="getProductsAsJson" returnformat="json" returntype="array" access="remote">
         <cfargument  name="subCategoryId" required="true" type="integer">
-        <cfargument  name="priceFrom" required="false" type="integer">
-        <cfargument  name="priceTo" required="false" type="integer">
-        <cfset local.userDetailsQuery = getUserDetails(
+        <cfargument  name="priceFrom" required="true" type="integer">
+        <cfargument  name="priceTo" required="true" type="integer">
+        <cfset local.productQuery = getProducts(
             subCategoryId = arguments.subCategoryId,
             priceFrom = arguments.priceFrom,
             priceTo = arguments.priceTo
         )>
+        <cfset local.resultArray = []>
+        <cfloop query="local.productQuery">
+            <cfset local.resultStruct = {}>
+            <cfset local.resultStruct["product_ID"] = local.productQuery.fldProduct_ID>
+            <cfset local.resultStruct["subCategoryId"] = local.productQuery.fldSubCategoryId>
+            <cfset local.resultStruct["subCategory_ID"] = local.productQuery.fldSubCategory_ID>
+            <cfset local.resultStruct["productName"] = local.productQuery.fldProductName>
+            <cfset local.resultStruct["brandId"] = local.productQuery.fldBrandId>
+            <cfset local.resultStruct["description"] = local.productQuery.fldDescription>
+            <cfset local.resultStruct["categoryName"] = local.productQuery.fldCategoryName>
+            <cfset local.resultStruct["price"] = local.productQuery.fldPrice>
+            <cfset local.resultStruct["tax"] = local.productQuery.fldTax>
+            <cfset local.resultStruct["category_ID"] = local.productQuery.fldCategory_ID>
+            <cfset local.resultStruct["brandName"] = local.productQuery.fldBrandName>
+            <cfset local.resultStruct["brandId"] = local.productQuery.fldBrandId>
+            <cfset local.resultStruct["subCategoryName"] = local.productQuery.fldSubCategoryName>
+            <cfset local.resultStruct["imageFileName"] = local.productQuery.fldImageFileName>
+            <cfset arrayAppend(local.resultArray, local.resultStruct)>
+        </cfloop>
+        <cfreturn local.resultArray>
     </cffunction>
 
     <!--- GET PRODUCTS --->
@@ -296,7 +316,7 @@
             LEFT JOIN tblProductImages AS I ON C.fldProductId = I.fldProductId
                 AND I.fldDefaultImage = 1
             LEFT JOIN tblBrands AS B ON P.fldBrandId = b.fldBrand_ID
-            WHERE C.fldUserId = <cfqueryparam value="#session.userId#" cfsqltype="numeric">
+            WHERE C.fldUserId = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
             <cfif structKeyExists(arguments, "productId")>
                 AND C.fldProductId = <cfqueryparam value="#arguments.productId#" cfsqltype="numeric">
             </cfif>
@@ -424,8 +444,7 @@
             WHERE
                 <cfif structKeyExists(arguments, "userId")>
                     fldUser_ID = <cfqueryparam value="#arguments.userId#" cfsqltype="numeric">
-                </cfif>
-                <cfif structKeyExists(arguments, "email")>
+                <cfelseif structKeyExists(arguments, "email")>
                     fldEmail = <cfqueryparam value="#arguments.email#" cfsqltype="varchar">
                 </cfif>
         </cfquery>

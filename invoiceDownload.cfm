@@ -4,7 +4,9 @@
         orderId = url.orderId
     )>
 
+    <cfset local.fileName = dateTimeFormat(now(),"dd-mm-yyyy-hh-nn-ss")>
     <cfoutput>
+        <cfheader name="content-disposition" value="attachment;filename=#url.orderId#(#local.fileName#).pdf">
         <cfdocument  
             format="PDF"
         >
