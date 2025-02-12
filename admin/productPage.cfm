@@ -68,27 +68,35 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                </tr>
-                <cfloop query="productDisplay">
-                    <tr class="border" id="#productDisplay.fldProduct_ID#">
-                        <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldProductName#</td>
-                        <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldBrandName#</td>
-                        <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldPrice#</td>
-                        <td class="d-flex justify-content-center align-items-center w-75 py-3">
-                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="##staticBackdropImages" value="#productDisplay.fldProduct_ID#"
-                            onclick="editImage({productId:#productdisplay.fldProduct_ID#})">
-                                <img src="../assets/productImages/#productDisplay.fldImageFileName#" alt="productImage" width="100">
-                            </button>
-                        </td>
-                        <td>
-                            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#productDisplay.fldProduct_ID#"
-                            onclick="autoPopulateProduct({categoryId:#url.categoryId#,subCategoryId:#productDisplay.fldSubCategoryId#,productName:'#productDisplay.fldProductName#',productBrand:#productDisplay.fldBrandId#,productDescription:'#productDisplay.fldDescription#',productPrice:#productDisplay.fldPrice#,productTax:#productDisplay.fldTax#,productId:#productDisplay.fldProduct_ID#})">
-                                Edit
-                            </button>
-                        </td>
-                        <td><button class="btn btn-danger me-2" value="#productDisplay.fldProduct_ID#" onclick="deleteProduct(this)">Delete</button></td>
                     </tr>
-                </cfloop>
+                    <cfif queryRecordCount(productDisplay)>
+                        <cfloop query="productDisplay">
+                            <tr class="border" id="#productDisplay.fldProduct_ID#">
+                                <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldProductName#</td>
+                                <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldBrandName#</td>
+                                <td class="d-flex justify-content-center align-items-center w-75 py-3">#productDisplay.fldPrice#</td>
+                                <td class="d-flex justify-content-center align-items-center w-75 py-3">
+                                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="##staticBackdropImages" value="#productDisplay.fldProduct_ID#"
+                                    onclick="editImage({productId:#productdisplay.fldProduct_ID#})">
+                                        <img src="../assets/productImages/#productDisplay.fldImageFileName#" alt="productImage" width="100">
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="##staticBackdrop" value="#productDisplay.fldProduct_ID#"
+                                    onclick="autoPopulateProduct({categoryId:#url.categoryId#,subCategoryId:#productDisplay.fldSubCategoryId#,productName:'#productDisplay.fldProductName#',productBrand:#productDisplay.fldBrandId#,productDescription:'#productDisplay.fldDescription#',productPrice:#productDisplay.fldPrice#,productTax:#productDisplay.fldTax#,productId:#productDisplay.fldProduct_ID#})">
+                                        Edit
+                                    </button>
+                                </td>
+                                <td><button class="btn btn-danger me-2" value="#productDisplay.fldProduct_ID#" onclick="deleteProduct(this)">Delete</button></td>
+                            </tr>
+                        </cfloop>
+                    <cfelse>
+                        <tr>
+                            <td>
+                                NO PRODUCTS
+                            </td>
+                        </tr>
+                    </cfif>
                 </table>
             </div>
 

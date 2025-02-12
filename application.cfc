@@ -3,14 +3,15 @@
     <cfset this.datasource = "shoppingCartDataSource">
     <cfset this.sessionmanagement="true">
 
-    <cffunction  name="onApplicationStart">
+    <cffunction  name="onApplicationStart" returntype="boolean">
         <cfset application.adminObject = createObject("component","admin.components.adminComponent")>
         <cfset application.userObject = createObject("component", "components.user")>
+        <cfreturn true>
     </cffunction>
 
-   <cffunction  name="onRequestStart">
+   <cffunction  name="onRequestStart" returntype="boolean">
         <cfargument  name="requestedPage">
-        <cfset local.publicPages = ["/admin/adminLogin.cfm", "/userSignUp.cfm", "/userLogin.cfm", "/admin/errorPage.cfm"]>
+        <cfset local.publicPages = ["/admin/adminLogin.cfm", "/userSignUp.cfm", "/userLogin.cfm", "/admin/errorPage.cfm", "/index.cfm", "/userCategoryPage.cfm", "/userSubCategoryPage.cfm", "/productPage.cfm", "/components/user.cfc"]>
         <cfif NOT arrayFind(local.publicPages,arguments.requestedPage) AND NOT structKeyExists(session, "userId")>
             <cfif listFirst(cgi.SCRIPT_NAME, '/') EQ "admin">
                 <cflocation  url="../admin/adminLogin.cfm">
@@ -21,10 +22,12 @@
         <cfif structKeyExists(url, "reload") AND url.reload EQ true>
             <cfset  onApplicationStart()>
         </cfif>
+        <cfreturn true>
     </cffunction>
 
-    <cffunction  name="onMissingTemplate">
+    <cffunction  name="onMissingTemplate" returntype="boolean">
         <cfinclude  template="admin/errorPage.cfm">
+        <cfreturn true>
     </cffunction>
 
     

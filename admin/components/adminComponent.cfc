@@ -332,7 +332,7 @@
     <cffunction  name="checkProductExistence" returntype="boolean">
         <cfargument  name="subCategoryId" required="true" type="integer">
         <cfargument  name="productName" required="true" type="string">
-        <cfargument  name="productId" required="true" type="integer">
+        <cfargument  name="productId" type="integer">
         <cfquery name="local.productExistence">
             SELECT
                 fldProductName
@@ -504,7 +504,7 @@
     </cffunction>
 
     <!--- DELETE IMAGE --->
-    <cffunction  name="deleteProductImage" access="remote" returntype="true">
+    <cffunction  name="deleteProductImage" access="remote" returntype="boolean">
         <cfargument  name="imageId" required="true" type="integer">
         <cfquery name="local.deleteImage" result="local.deleteResult">
             UPDATE
