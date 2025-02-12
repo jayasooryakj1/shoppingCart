@@ -499,7 +499,8 @@
         <cfquery name="local.autoPopulateImage">
             SELECT
                 fldProductImage_ID,
-                fldImageFileName
+                fldImageFileName,
+                fldDefaultImage
             FROM
                 tblProductImages
             WHERE
@@ -507,13 +508,17 @@
                 AND fldActive = 1
         </cfquery>
         <cfloop query="local.autoPopulateImage">
-            <cfset local.imageStruct[local.autoPopulateImage.fldProductImage_ID] = local.autoPopulateImage.fldImageFileName>
+            <cfif local.autoPopulateImage.fldDefaultImage EQ 1>
+                <cfset local.imageStruct.defaultImage[local.autoPopulateImage.fldProductImage_ID] = local.autoPopulateImage.fldImageFileName>
+            <cfelse>
+                <cfset local.imageStruct.images[local.autoPopulateImage.fldProductImage_ID] = local.autoPopulateImage.fldImageFileName>
+            </cfif>
         </cfloop>
         <cfreturn local.imageStruct>
     </cffunction>
 
     <!--- DELETE IMAGE --->
-    <cffunction  name="deleteProductImage" access="remote" returntype="boolean">
+    <cffunction  name="deleteProductImage" access="remote" returntype="struct" returnformat="JSON">
         <cfargument  name="imageId" required="true" type="integer">
         <cfquery name="local.deleteImage" result="local.deleteResult">
             UPDATE
@@ -524,7 +529,9 @@
                 fldProductImage_ID = <cfqueryparam value="#arguments.imageId#" cfsqltype="NUMERIC">
                 AND fldDefaultImage = 0
         </cfquery>
-        <cfreturn true>
+        <cfset local.deleteResultStruct = {}>
+        <cfset local.deleteResultStruct["deleteCount"] = local.deleteResult.recordCount>
+        <cfreturn  local.deleteResultStruct>
     </cffunction>
 
     <!--- SET DEFAULT IMAGE --->
