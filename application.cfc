@@ -31,7 +31,7 @@
     </cffunction>
 
     
-    <!---<cffunction name="onError" returnType="void">
+    <cffunction name="onError" returnType="void">
         <cfargument name="Exception" required=true/>
         <cfargument name="EventName" type="String" required=true/>
         <cfmail  from="jayasoorya@gmail.com"  subject="Error"  to="abc@gmail.com">
@@ -40,6 +40,6 @@
             Error details: #arguments.exception#
         </cfmail>
         <cflocation  url="./admin/errorPage.cfm">
-    </cffunction>--->
+    </cffunction>
 
 </cfcomponent>
