@@ -184,16 +184,25 @@ function editImage(productStruct) {
         data:{editProductId:editProductId},
         success:function(result){
             productImages=JSON.parse(result)
-            var active = 1;
-            for (var key in productImages) {
-                if (productImages.hasOwnProperty(key)) {
+            for (var key in productImages.defaultImage) {
+                if (productImages.defaultImage.hasOwnProperty(key)) {
                     var sliderBody = document.createElement('div');
                     var sliderImage = document.createElement('img');
                     document.getElementById("carousel-button").innerHTML = ""
-                    if (active == 1) {
-                        sliderBody.classList.add("active");
-                        active=0;
-                    }
+                    sliderBody.classList.add("active");
+                    sliderBody.classList.add("carousel-item");
+                    sliderImage.src="../assets/productimages/"+productImages.defaultImage[key];
+                    sliderImage.height=350;
+                    sliderImage.width=350;
+                    sliderBody.appendChild(sliderImage)
+                    document.getElementById("carousel-inner").appendChild(sliderBody)
+                }
+            }
+            for (var key in productImages.images) {
+                if (productImages.images.hasOwnProperty(key)) {
+                    var sliderBody = document.createElement('div');
+                    var sliderImage = document.createElement('img');
+                    document.getElementById("carousel-button").innerHTML = ""
                     var deleteButton = document.createElement('button')
                     deleteButton.classList.add("btn")
                     deleteButton.classList.add("btn-danger")
@@ -219,7 +228,8 @@ function editImage(productStruct) {
                         defaultProductImage({productId:productStruct.productId,imageId:this});
                     };
                     sliderBody.classList.add("carousel-item");
-                    sliderImage.src="../assets/productimages/"+productImages[key];
+                    sliderImage.src="../assets/productimages/"+productImages.images[key];
+                    sliderImage.height=350;
                     sliderImage.width=350;
                     sliderBody.appendChild(defaultButton)
                     sliderBody.appendChild(deleteButton)
@@ -238,7 +248,11 @@ function deleteProductImage(imageId) {
             type:"post",
             url:"components/adminComponent.cfc?method=deleteProductImage",
             data:{imageId:imageId.value},
-            success:function(){
+            success:function(result){
+                let res = JSON.parse(result);
+                if (res.deleteCount==0) {
+                 alert("Unable to delete default image")
+                }
                 location.reload();
             }
         })
