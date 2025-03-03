@@ -66,6 +66,9 @@
             <cfset local.hashedPasswordInput = hash("#arguments.password#"&"#local.userValidation.fldUserSaltString#","SHA-256","UTF-8")>
             <cfif local.hashedPasswordInput EQ local.userValidation.fldHashedPassword>
                 <cfset session.userId = local.userValidation.fldUser_ID>
+                <cfset session.cartCount = displayCart(
+                    userId = session.userId
+                ).recordCount>
                 <cfreturn true>
             <cfelse>
                 <cfreturn false>
@@ -112,7 +115,7 @@
     </cffunction>
 
     <!--- GET PRODUCT IMAGES --->
-    <cffunction  name="getProductImages" returntype="query">
+    <!---<cffunction  name="getProductImages" returntype="query">
         <cfargument  name="productId" required="true" type="numeric">
         <cfquery name="local.getProductImages">
             SELECT
@@ -125,7 +128,7 @@
                 AND fldActive = 1
         </cfquery>
         <cfreturn local.getProductImages>
-    </cffunction>
+    </cffunction>--->
 
     <!--- GET PRODUCTS AS JSON --->
     <cffunction  name="getProductsAsJson" returnformat="json" returntype="array" access="remote">
@@ -140,7 +143,7 @@
         <cfset local.resultArray = []>
         <cfloop query="local.productQuery">
             <cfset local.resultStruct = {}>
-            <cfset local.resultStruct["product_ID"] = local.productQuery.fldProduct_ID>
+            <cfset local.resultStruct["productId"] = local.productQuery.fldProduct_ID>
             <cfset local.resultStruct["subCategoryId"] = local.productQuery.fldSubCategoryId>
             <cfset local.resultStruct["subCategory_ID"] = local.productQuery.fldSubCategory_ID>
             <cfset local.resultStruct["productName"] = local.productQuery.fldProductName>
@@ -185,12 +188,19 @@
                 fldBrandName,
                 fldBrandId,
                 fldSubCategoryName,
-                fldImageFileName
+                <cfif structKeyExists(arguments, "productId")>
+                    GROUP_CONCAT(fldImageFileName) AS images
+                <cfelse>
+                    fldImageFileName
+                </cfif>
             FROM
                 tblSubCategory AS S
             INNER JOIN tblCategory AS C ON C.fldCategory_ID = S.fldCategoryId AND C.fldActive = 1
             LEFT JOIN tblProduct AS P ON S.fldSubCategory_ID = P.fldSubCategoryId AND P.fldActive = 1
-            LEFT JOIN tblProductImages AS I ON I.fldProductId = P.fldProduct_ID AND I.fldDefaultImage = 1
+            LEFT JOIN tblProductImages AS I ON I.fldProductId = P.fldProduct_ID
+                <cfif NOT structKeyExists(arguments, "productId")>
+                    AND I.fldDefaultImage = 1
+                </cfif>
             LEFT JOIN tblBrands AS B ON P.fldBrandId = B.fldBrand_ID AND B.fldActive = 1
             WHERE
                 S.fldActive = 1
@@ -233,6 +243,9 @@
                     <cfelse>
                         ORDER BY (fldPrice + fldTax) DESC
                     </cfif>
+                <cfelseif structKeyExists(arguments, "productId")>
+                    ORDER BY
+                        fldDefaultImage DESC
                 <cfelse>
                     ORDER BY
                         fldSubCategoryId,
@@ -344,6 +357,7 @@
                 )>
             <cfelse>
                 <cfset local.resultStruct["count"] = 1>
+                <cfset session.cartCount = session.cartCount+1>
                 <cfquery name="local.addToCart">
                     INSERT INTO
                         tblCart (
@@ -358,14 +372,14 @@
                     )
                 </cfquery>
             </cfif>
-            <cfquery name="cartCount">
+            <!---<cfquery name="cartCount">
                 SELECT
                     COUNT(*) as count
                 FROM
                     tblCart
-            </cfquery>
+            </cfquery>--->
             <cfset local.resultStruct["success"]=true>
-            <cfset local.resultStruct["count"] = cartCount.count>
+            <cfset local.resultStruct["count"] = session.cartCount>
         <cfelse>
             <cfset local.resultStruct["redirect"]=true>
         </cfif>
@@ -385,11 +399,7 @@
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
         </cfquery>
-        <cfif arguments.updateType EQ "-" AND local.checkZero.fldQuantity EQ 1>
-            <cfset deleteCart = deleteCart(
-                cartId = arguments.cartId
-            )>
-        <cfelse>
+        <cfif NOT (arguments.updateType EQ "-" AND local.checkZero.fldQuantity EQ 1)>
             <cfquery name="local.updateCartQuery">
                 UPDATE
                     tblCart
@@ -417,13 +427,14 @@
             WHERE
                 fldCart_ID = <cfqueryparam value="#arguments.cartId#" cfsqltype="numeric">
         </cfquery>
-        <cfquery name="local.getCount">
+        <!---<cfquery name="local.getCount">
             SELECT
                 COUNT(*) as count
             FROM
                 tblCart
-        </cfquery>
-        <cfset local.deleteCartResult["count"] = local.getCount.count>
+        </cfquery>--->
+        <cfset session.cartCount = session.cartCount-1>
+        <cfset local.deleteCartResult["count"] = session.cartCount>
         <cfset local.deleteCartResult["success"] = true>
         <cfreturn local.deleteCartResult>
     </cffunction>
@@ -603,20 +614,21 @@
         <cfargument  name="userId" required="true" type="integer">
         <cfargument  name="orderId" required="false" type="string">
         <cfargument  name="searchOrderId" required="false" type="string">
+        <cfargument  name="pageValue" required="false" type="integer">
         <cfquery name="local.historyDetails">
             SELECT
                 O.fldOrder_ID AS orderId,
-                OI.fldProductId AS productId,
+                GROUP_CONCAT(OI.fldProductId) AS productId,
                 O.fldTotalPrice AS totalPrice,
                 O.fldTotalTax AS totalTax,
                 O.fldOrderDate AS orderDate,
-                P.fldProductName AS productName,
-                PI.fldImageFileName AS image,
-                OI.fldUnitPrice AS unitPrice,
-                OI.fldUnitTax AS unitTax,
-                OI.fldQuantity AS quantity,
-                B.fldBrand_ID AS brandId,
-                B.fldBrandName AS brandName,
+                GROUP_CONCAT(P.fldProductName) AS productName,
+                GROUP_CONCAT(PI.fldImageFileName) AS image,
+                GROUP_CONCAT(OI.fldUnitPrice) AS unitPrice,
+                GROUP_CONCAT(OI.fldUnitTax) AS unitTax,
+                GROUP_CONCAT(OI.fldQuantity) AS quantity,
+                GROUP_CONCAT(B.fldBrand_ID) AS brandId,
+                GROUP_CONCAT(B.fldBrandName) AS brandName,
                 A.fldFirstName AS firstName,
                 A.fldLastName AS lastName,
                 A.fldAddressLine1 AS line1,
@@ -639,8 +651,16 @@
             <cfelseif structKeyExists(arguments, "searchOrderId")>
                 AND O.fldOrder_ID LIKE <cfqueryparam value="%#arguments.searchOrderId#%" cfsqltype="varchar">
             </cfif>
+            GROUP BY
+                O.fldOrder_ID
             ORDER BY
                 fldOrderDate DESC
+            <cfif structKeyExists(arguments, "pageValue")>
+                LIMIT 
+                    5
+                OFFSET
+                    #url.pageValue*5-5#
+            </cfif>
         </cfquery>
         <cfreturn local.historyDetails>
     </cffunction>

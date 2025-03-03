@@ -5,17 +5,11 @@
             subCategoryId = form.subCategoryId,
             subCategoryName = form.subCategoryName
         )>
-        <cfif result>
-            <div>Name already exists</div>
-        </cfif>
     <cfelse>
         <cfset result = application.adminObject.addSubCategory(
             categoryId = form.categoryId,
             subCategoryName = form.subCategoryName
         )>
-        <cfif result>
-            <div>Name already exists</div>
-        </cfif>
     </cfif>
 </cfif>
 
@@ -24,6 +18,11 @@
         <div>
             <div class="d-flex flex-column align-items-center justify-content-center mt-5">
                 <div>
+                    <cfif structKeyExists(variables, "result") and result>
+                        <div class="mb-3 text-danger">
+                            SUB CATEGORY NAME ALREADY EXISTS
+                        </div>
+                    </cfif>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="##staticBackdrop" 
                     onclick="addSubCategory({categoryId:#url.categoryId#})">
                         ADD SUB CATEGORY +
@@ -40,7 +39,7 @@
                     <tr class="border">
                         <th class="w-75 subCategoryName">
                             <a href="./index.cfm">
-                                #url.categoryName#
+                                &lt-#url.categoryName#
                             </a>
                         </th>
                         <th></th>
@@ -92,10 +91,11 @@
                                 SUB CATEGORY NAME: 
                                 <input name="subCategoryName" id="subCategoryNameField" type="text" required>
                                 <input type="hidden" name="subCategoryId" id="subCategoryIdField">
+                                <div id="subCategoryError" class="text-danger"></div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" name="subCategorySubmit" id="modalSubmit" value="SUBMIT" class="btn btn-secondary">SUBMIT</button>
+                                <button type="submit" name="subCategorySubmit" id="modalSubmit" value="SUBMIT" onclick="validateText('subCategoryNameField','subCategoryError')" class="btn btn-secondary">SUBMIT</button>
                             </div>
                         </form>
                     </div>
@@ -103,4 +103,4 @@
             </div>
         </div>
     </cfoutput>
-<cfinclude  template="./footer.cfm">
+<cfinclude  template="footer.cfm">

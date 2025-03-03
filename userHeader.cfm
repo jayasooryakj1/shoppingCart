@@ -1,7 +1,5 @@
 <cfset variables.categoryDropdown = application.userObject.getCategory()>
 <!DOCTYPE html>
-<cfoutput>
-
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -39,10 +37,11 @@
                             <a href="./cart.cfm" class="cartIcon">
                                 <i class="fa-solid fa-cart-shopping text-light"></i>
                                 <cfif structKeyExists(session, "userId")>
-                                    <cfset cartCount = application.userObject.displayCart()>
-                                    <span class="badge" id="notificationCounter">
-                                        #queryRecordCount(cartCount)#
-                                    </span>
+                                    <cfoutput>
+                                        <span class="badge" id="notificationCounter">
+                                            #session.cartCount#
+                                        </span>
+                                    </cfoutput>
                                 </cfif>
                             </a>
                         </div>
@@ -68,31 +67,20 @@
                 </div>
             </div>
             <div class="categoryBar">
-            <cfloop query="variables.categoryDropdown" group="fldCategory_ID">
+            <cfoutput query="variables.categoryDropdown" group="fldCategory_ID">
                 <div class="dropDown">
                     <a href="userCategoryPage.cfm?categoryId=#variables.categoryDropdown.fldCategory_ID#">
                         #variables.categoryDropdown.fldCategoryName#
                     </a>
                     <div class="tooltiptext">
-                        <cfquery name="variables.subCategoryName" dbtype="query">
-                            SELECT
-                                fldSubCategoryName,
-                                fldSubCategory_ID
-                            FROM
-                                variables.categoryDropdown
-                            WHERE
-                                fldSubCategory_ID IS NOT NULL
-                                AND fldCategory_ID = #variables.categoryDropdown.fldCategory_ID#
-                        </cfquery>
-                        <cfloop query="variables.subCategoryName">
-                            <a href="userSubCategoryPage.cfm?subCategoryId=#variables.subCategoryName.fldSubCategory_ID#">
-                                <button class="btn btn-light w-100">#variables.subCategoryName.fldSubCategoryName#</button>
+                        <cfoutput>
+                            <a href="userSubCategoryPage.cfm?subCategoryId=#variables.categoryDropdown.fldSubCategory_ID#">
+                                <button class="btn btn-light w-100">#variables.categoryDropdown.fldSubCategoryName#</button>
                             </a>
-                        </cfloop>
+                        </cfoutput>
                     </div>
                 </div>
-            </cfloop>
+            </cfoutput>
             </div>
         </div>
-</cfoutput>
 <div class="p-3">

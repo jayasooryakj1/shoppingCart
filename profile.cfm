@@ -46,7 +46,7 @@
                         </button>
                     </div>
                     <div>
-                        <a href="orderHistory.cfm">
+                        <a href="orderHistory.cfm?pageValue=1">
                             <button type="button" class="btn btn-outline-success m-2 p-2">
                                 ORDER HISTORY
                             </button>
@@ -87,26 +87,30 @@
                         <div class="modal-body d-flex flex-column align-items-center justify-content-center">
                             <div>
                                 First Name
-                                <input type="text" id="modalFirstName" name="firstName" value="#userDetails.fldFirstName#" placeholder="FIRST NAME" class="form-control mb-2">
+                                <input type="text" id="modalFirstName" name="firstName" value="#userDetails.fldFirstName#" placeholder="FIRST NAME" class="form-control mb-2" required>
                             </div>
+                            <div class="text-danger" id="profileFirstNameError"></div>
                             <br>
                             <div>
                                 Last Name
-                                <input type="text" id="modalLastName" name="lastName" value="#userDetails.fldLastName#" placeholder="LAST NAME" class="form-control mb-2">
+                                <input type="text" id="modalLastName" name="lastName" value="#userDetails.fldLastName#" placeholder="LAST NAME" class="form-control mb-2" required>
                             </div>
+                            <div class="text-danger" id="profileLastNameError"></div>
                             <br>
                             <div>
                                 Email
-                                <input type="text" id="modalEmail" name="email" value="#userDetails.fldEmail#" placeholder="EMAIL" class="form-control mb-2">
+                                <input type="email" id="modalEmail" name="email" value="#userDetails.fldEmail#" placeholder="EMAIL" class="form-control mb-2" required>
                             </div>
+                            <div class="text-danger" id="profileEmailError"></div>
                             <br>
                             <div>
                                 Phone Number
-                                <input type="number" id="modalPhone" name="phone" value="#userDetails.fldPhone#" placeholder="PHONE NUMBER" class="form-control mb-2">
+                                <input type="tel" id="modalPhone" pattern="[0-9]{10}" title="Invalid phone number" name="phone" value="#userDetails.fldPhone#" placeholder="PHONE NUMBER" class="form-control mb-2" required>
                             </div>
+                            <div class="text-danger" id="profilePhoneError"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" name="editUserButton" class="btn btn-primary">
+                            <button type="submit" onclick="return validateEditProfile()" name="editUserButton" class="btn btn-primary">
                                 SUBMIT
                             </button>
                         </div>     
@@ -126,32 +130,40 @@
                     <form method="post">
                         <div class="modal-body d-flex flex-column justify-content-center align-items-center">
                             <div>
-                                <input type="text" placeholder="FIRST NAME" name="addressFirstName" class="form-control mb-3" required>
+                                <input type="text" placeholder="FIRST NAME" id="firstNameAddress" name="addressFirstName" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressFirstNameError"></div>
                             <div>
-                                <input type="text" placeholder="LAST NAME" name="addressLastName" class="form-control mb-3" required>
+                                <input type="text" placeholder="LAST NAME" id="lastNameAddress" name="addressLastName" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressLastNameError"></div>
                             <div>
-                                <input type="text" placeholder="ADDRESS LINE 1" name="addressLine1" class="form-control mb-3" required>
+                                <input type="text" placeholder="ADDRESS LINE 1" id="line1Address" name="addressLine1" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressLine1Error"></div>
                             <div>
-                                <input type="text" placeholder="ADDRESS LINE 2" name="addressLine2" class="form-control mb-3" required>
+                                <input type="text" placeholder="ADDRESS LINE 2" id="line2Address" name="addressLine2" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressLine2Error"></div>
                             <div>
-                                <input type="text" placeholder="CITY" name="addressCity" class="form-control mb-3" required>
+                                <input type="text" placeholder="CITY" name="addressCity" id="cityAddress" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressCityError"></div>
                             <div>
-                                <input type="text" placeholder="STATE" name="addressState" class="form-control mb-3" required>
+                                <input type="text" placeholder="STATE" name="addressState" id="stateAddress" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressStateError"></div>
                             <div>
-                                <input type="tel" placeholder="PINCODE" name="addressPincode" pattern="[0-9]{6}" class="form-control mb-3" required>
+                                <input type="tel" placeholder="PINCODE" name="addressPincode" id="pincodeAddress" pattern="[0-9]{6}" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressPincodeError"></div>
                             <div>
-                                <input type="tel" placeholder="PHONE NUMBER" name="addressPhone" pattern="[0-9]{10}" class="form-control mb-3" required>
+                                <input type="tel" placeholder="PHONE NUMBER" name="addressPhone" id="phoneAddress" pattern="[0-9]{10}" class="form-control mb-3" required>
                             </div>
+                            <div class="text-danger" id="addressPhoneError"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" name="addAddress" class="btn btn-primary">SUBMIT</button>
+                            <button type="submit" name="addAddress" onclick="return validateAddAddress()" class="btn btn-primary">SUBMIT</button>
                         </div>
                     </form>
                 </div>

@@ -20,7 +20,7 @@
                                 #variables.randomProducts.fldBrandName#
                             </div>
                             <div>
-                                <i class="fa-solid fa-indian-rupee-sign"></i> #variables.randomProducts.fldPrice + variables.randomProducts.fldTax#
+                                <i class="fa-solid fa-indian-rupee-sign"></i> #variables.randomProducts.fldPrice + variables.randomProducts.fldTax*variables.randomProducts.fldPrice/100#
                             </div>
                         </a>
                     </div>

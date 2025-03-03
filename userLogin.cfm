@@ -36,8 +36,8 @@
             </div>
         </form>
         <cfif structKeyExists(variables, "result") AND NOT variables.result>
-            <div>
-                Invalid email or password
+            <div class="text-danger">
+                Invalid email/phone number/password
             </div>
         </cfif>
         <div>

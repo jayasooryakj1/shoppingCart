@@ -1,6 +1,6 @@
 <cfif structKeyExists(form, "productSubmitButton")>
     <cfif form.productSubmitButton EQ 1>
-        <cfset result = application.adminObject.addProduct(
+        <cfset addResult = application.adminObject.addProduct(
             subCategoryId = form.subCategoryId,
             productName = form.productName,
             brandId = form.brandId,
@@ -9,9 +9,6 @@
             productTax = form.productTax,
             productImages = form.productImages
         )>
-        <cfif result>
-            <div>Name already exists</div>
-        </cfif>
     <cfelse>
         <cfif isDefined("form.productImages") AND form.productImages IS NOT "">
             <cfset result = application.adminObject.editProduct(
@@ -34,9 +31,6 @@
                 productTax = form.productTax,
                 productId = form.hiddenModalProductId
             )>
-        </cfif>
-        <cfif result>
-            <div>name already exists</div>
         </cfif>
     </cfif>
 </cfif>
@@ -61,7 +55,7 @@
                     <th class="w-75 productName">
                         <a href="./subCategoryPage.cfm?categoryId=#url.categoryId#&categoryName=#url.CategoryName#">
                             <cfoutput>
-                                #url.subCategoryName#
+                                &lt-#url.subCategoryName#
                             </cfoutput>
                         </a>
                     </th>
@@ -138,11 +132,11 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="staticBackdropLabel"></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearForm()"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
                             <div class="modal-body">
-                                <cfset categoryDropDown = application.adminObject.autoPopulateCategoryModalDropDown()>
+                                <cfset categoryDropDown = application.adminObject.dipslayCategories()>
                                 <cfset subCategoryDropDown = application.adminObject.autoPopulateSubCategoryModal(
                                     categoryId = url.categoryId
                                 )>
@@ -163,6 +157,7 @@
                                 <br><br>
                                 PRODUCT NAME:<br>
                                 <input type="text" id="modalProductName" name="productName" required>
+                                <div class="text-danger" id="productNameError"></div>
                                 <br><br>
                                 PRODUCT BRAND:
                                 <select name="brandId" id="brandSelect">
@@ -170,25 +165,31 @@
                                         <option value="#brandDropDown.fldBrand_ID#">#brandDropDown.fldBrandName#</option>
                                     </cfloop>
                                 </select>
+                                <div id="brandError" class="text-danger"></div>
                                 <br><br>
                                 PRODUCT DESCRIPTION:<br>
                                 <textarea type="text" cols="60" rows="10" name="productDescription" id="modalProductDescription" required></textarea>
+                                <div class="text-danger" id="descriptionError"></div>
                                 <br><br>
                                 PRODUCT PRICE:<br>
                                 <input type="number" step=".01" name="productPrice" required id="modalProductPrice">
+                                <div class="text-danger" id="priceError"></div>
                                 <br><br>
-                                PRODUCT TAX:<br>
+                                PRODUCT TAX (%):<br>
                                 <input type="number" step=".01" name="productTax" required id="modalProductTax">
+                                <div class="text-danger" id="taxError"></div>
                                 <br><br>
                                 PRODUCT IMAGES:<br>
                                 <input type="file" multiple name="productImages" required id="modalProductImages">
                                 <br><br>
+                                <div id="imageWarning" class="text-danger">
+                                </div>
                                 <input type="hidden" name="hiddenModalProductId" id="modalProductId" value="">
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearForm()">Close</button>
-                                <button type="submit" class="btn btn-primary" id="productSubmit" name="productSubmitButton">SUBMIT</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                                <button type="submit" class="btn btn-primary" id="productSubmit" onclick="return validateProduct()" name="productSubmitButton">SUBMIT</button>
                             </div>
                         </div>
                     </div>

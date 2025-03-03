@@ -7,48 +7,48 @@
             <div class="w-75 mb-5">
                 <cfif queryRecordCount(variables.displayCart)>
                     <cfloop query="variables.displayCart">
-                            <cfset unitPrice = variables.displayCart.fldPrice+variables.displayCart.fldTax>
-                            <div id="itemCard#variables.displayCart.fldCart_ID#" class="d-flex p-4 align-items-center border mb-4">
-                                <div class="w-25 p-2">
-                                    <a href="./productPage.cfm?productId=#variables.displayCart.fldProductId#"><img src="assets/productImages/#variables.displayCart.fldImageFileName#" class="w-100" alt=""></a>
+                        <cfset unitPrice = variables.displayCart.fldPrice+variables.displayCart.fldTax>
+                        <div id="itemCard#variables.displayCart.fldCart_ID#" class="d-flex p-4 align-items-center border mb-4">
+                            <div class="w-25 p-2">
+                                <a href="./productPage.cfm?productId=#variables.displayCart.fldProductId#"><img src="assets/productImages/#variables.displayCart.fldImageFileName#" class="w-100" alt=""></a>
+                            </div>
+                            <div class="w-75 ms-5">
+                                <div class="link"><a href="./productPage.cfm?productId=#variables.displayCart.fldProductId#"><h4>#variables.displayCart.fldProductName#</h4></a></div>
+                                <div>#variables.displayCart.fldBrandName#</div>
+                                <div>
+                                    Quantity: 
+                                    <button class="btn btn-danger px-3" 
+                                        onclick="updateQuantity(
+                                            '-',
+                                            #variables.displayCart.fldCart_ID#,
+                                            #(variables.displayCart.fldPrice + variables.displayCart.fldTax)#
+                                        )"
+                                    >
+                                        -
+                                    </button>
+                                    <span id = "cartQuantity#variables.displayCart.fldCart_ID#"> 
+                                        #variables.displayCart.fldQuantity# 
+                                    </span>
+                                    <button class="btn btn-success" 
+                                        onclick="updateQuantity(
+                                            '+',
+                                            #variables.displayCart.fldCart_ID#,
+                                            #(variables.displayCart.fldPrice + variables.displayCart.fldTax)#
+                                            
+                                        )"
+                                    >
+                                        +
+                                    </button>
+                                    <button class="btn btn-outline-danger ms-5" value="#variables.displayCart.fldCart_ID#" onclick="deleteCart(this)">REMOVE</button>
                                 </div>
-                                <div class="w-75 ms-5">
-                                    <div class="link"><a href="./productPage.cfm?productId=#variables.displayCart.fldProductId#"><h4>#variables.displayCart.fldProductName#</h4></a></div>
-                                    <div>#variables.displayCart.fldBrandName#</div>
-                                    <div>
-                                        Quantity: 
-                                        <button class="btn btn-danger px-3" 
-                                            onclick="updateQuantity(
-                                                '-',
-                                                #variables.displayCart.fldCart_ID#,
-                                                #(variables.displayCart.fldPrice + variables.displayCart.fldTax)#
-                                            )"
-                                        >
-                                            -
-                                        </button>
-                                        <span id = "cartQuantity#variables.displayCart.fldCart_ID#"> 
-                                            #variables.displayCart.fldQuantity# 
-                                        </span>
-                                        <button class="btn btn-success" 
-                                            onclick="updateQuantity(
-                                                '+',
-                                                #variables.displayCart.fldCart_ID#,
-                                                #(variables.displayCart.fldPrice + variables.displayCart.fldTax)#
-                                                
-                                            )"
-                                        >
-                                            +
-                                        </button>
-                                        <button class="btn btn-outline-danger ms-5" value="#variables.displayCart.fldCart_ID#" onclick="deleteCart(this)">REMOVE</button>
-                                    </div>
-                                    <div>Price: <i class="fa-solid fa-indian-rupee-sign"></i> <span id="price#variables.displayCart.fldCart_ID#">#variables.displayCart.fldPrice#</div>
-                                    <div class="mt-1">Tax: <i class="fa-solid fa-indian-rupee-sign"></i> <span id="tax#variables.displayCart.fldCart_ID#">#variables.displayCart.fldTax#</span></div>
-                                    <div class="mt-1">Total Price: 
-                                        <i class="fa-solid fa-indian-rupee-sign"></i> 
-                                        <span id="total#variables.displayCart.fldCart_ID#">#(variables.displayCart.fldPrice + variables.displayCart.fldTax)*variables.displayCart.fldQuantity#</span>
-                                    </div>
+                                <div>Price: <i class="fa-solid fa-indian-rupee-sign"></i> <span id="price#variables.displayCart.fldCart_ID#">#variables.displayCart.fldPrice#</div>
+                                <div class="mt-1">Tax: <i class="fa-solid fa-indian-rupee-sign"></i> <span id="tax#variables.displayCart.fldCart_ID#">#variables.displayCart.fldTax*variables.displayCart.fldPrice/100#</span></div>
+                                <div class="mt-1">Total Price: 
+                                    <i class="fa-solid fa-indian-rupee-sign"></i> 
+                                    <span id="total#variables.displayCart.fldCart_ID#">#(variables.displayCart.fldPrice + variables.displayCart.fldTax*variables.displayCart.fldPrice/100)*variables.displayCart.fldQuantity#</span>
                                 </div>
                             </div>
+                        </div>
                     </cfloop>
                 <cfelse>
                     <div class="m-auto">
@@ -65,7 +65,7 @@
                     <cfloop query="variables.displayCart">
                         <cfset variables.totalQuantity = variables.totalQuantity + variables.displayCart.fldQuantity>
                         <cfset variables.actualPrice = variables.actualPrice + (variables.displayCart.fldQuantity * variables.displayCart.fldPrice)>
-                        <cfset variables.totalTax = variables.totalTax + (variables.displayCart.fldQuantity * variables.displayCart.fldTax)>
+                        <cfset variables.totalTax = variables.totalTax + ((variables.displayCart.fldTax*variables.displayCart.fldPrice/100) * variables.displayCart.fldQuantity)>
                         <cfset variables.totalPrice = variables.actualPrice + variables.totalTax>
                     </cfloop>
                     <h5>Total Quantity : <span id="totalQuantity">#totalQuantity#</span></h5>

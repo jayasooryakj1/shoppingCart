@@ -1,10 +1,7 @@
 <cfif structKeyExists(form, "createCategory")>
-    <cfset result = application.adminObject.addCategory(
+    <cfset addResult = application.adminObject.addCategory(
         categoryName=form.categoryName
     )>
-    <cfif result>
-        <div>Name already exists</div>
-    </cfif>
 </cfif>
 
 <cfif structKeyExists(form, "editCategory")>
@@ -12,15 +9,25 @@
         categoryName=form.categoryName,
         categoryId=form.categoryId
     )>
-    <cfif result>
-        <div>Name already exists</div>
-    </cfif>
 </cfif>
 
 <cfinclude  template="./adminHeader.cfm">
         <div class="d-flex flex-column align-items-center justify-content-center mt-5">
             <div>
-
+            <cfif structKeyExists(variables, "addResult")>
+                <cfif variables.addResult>
+                    <div class="text-danger mb-3">
+                        CATEGORY NAME ALREADY EXISTS
+                    </div>
+                </cfif>
+            </cfif>
+            <cfif structKeyExists(variables, "result")>
+                <cfif variables.result>
+                    <div class="text-danger mb-3">
+                        CATEGORY NAME ALREADY EXISTS
+                    </div>
+                </cfif>
+            </cfif>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="addCategory()">
                     ADD CATEGORY +
                 </button>
@@ -61,13 +68,14 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            CATEGORY NAME: 
+                            CATEGORY NAME<span class="text-danger">*</span> :
                             <input name="categoryName" id="categoryNameField" type="text" required>
                             <input type="hidden" name="categoryId" id="categoryIdField">
+                            <div id="categoryNameError" class="text-danger"></div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <input type="submit" name="" id="modalSubmit" value="SUBMIT" class="btn btn-secondary">
+                            <input type="submit" name="" id="modalSubmit" onclick="return validateText('categoryNameField','categoryNameError')" value="SUBMIT" class="btn btn-secondary">
                         </div>
                     </form>
                 </div>

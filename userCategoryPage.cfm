@@ -3,67 +3,49 @@
 )>
 <cfinclude  template="./userHeader.cfm">
 
-    <cfoutput>
-
-        <div>
-            <cfset productsPresent = 0>
+    <div>
+        <cfset productsPresent = 0>
+            <cfoutput>
                 <h3 class="categoryName">
                     <a href="index.cfm">Home ></a>
                     #variables.productDetails.fldCategoryName#
                 </h3>
-                <cfloop query="variables.productDetails" group="fldSubCategory_ID">
-                    <cfquery name="variables.subCategoryProducts" dbtype="query">
-                        SELECT 
-                            fldProduct_ID,
-                            fldSubCategoryId,
-                            fldSubCategory_ID,
-                            fldProductName,
-                            fldCategoryName,
-                            fldPrice,
-                            fldTax,
-                            fldSubCategoryName,
-                            fldImageFileName
-                        FROM
-                            variables.productDetails
-                        WHERE
-                            fldSubCategory_ID = #variables.productDetails.fldSubCategory_ID#
-                            AND fldProduct_ID IS NOT NULL 
-                            AND fldSubCategory_ID IS NOT NULL
-                    </cfquery>
-                    <h4 class="mt-4 subCategory">
-                        <a href="userSubCategoryPage.cfm?subCategoryId=#variables.productDetails.fldSubCategory_ID#">
-                            #variables.productDetails.fldSubCategoryName#
-                        </a>
-                    </h4>
-                    <div class="d-flex">
-                        <cfset count = 0>
-                        <cfloop query="variables.subCategoryProducts">
+            </cfoutput>
+            <cfoutput query="variables.productDetails" group="fldSubCategory_ID">
+                <h4 class="mt-4 subCategory">
+                    <a href="userSubCategoryPage.cfm?subCategoryId=#variables.productDetails.fldSubCategory_ID#">
+                        #variables.productDetails.fldSubCategoryName#
+                    </a>
+                </h4>
+                <div class="d-flex">
+                    <cfset count = 0>
+                    <cfoutput>
+                        <cfif variables.productDetails.fldProduct_ID NEQ "">
                             <cfif count LT 6>
                                 <cfset count = count + 1>
                                 <cfset productsPresent = 1>
                                 <div class="mt-5 randomProducts d-flex flex-column justify-content-center align-items-center ms-5 border p-2 rounded">
-                                    <a href="productPage.cfm?productId=#variables.subCategoryProducts.fldProduct_ID#">
+                                    <a href="productPage.cfm?productId=#variables.productDetails.fldProduct_ID#">
                                         <div class="randomProductDiv d-flex flex-column justify-content-center align-items-center mb-2 p-1">
-                                            <img src="assets/productImages/#variables.subCategoryProducts.fldImageFileName#" alt="productImage">
+                                            <img src="assets/productImages/#variables.productDetails.fldImageFileName#" alt="productImage">
                                         </div>
                                         <div>
-                                            #variables.subCategoryProducts.fldProductName#
+                                            #variables.productDetails.fldProductName#
                                         </div>
                                         <div>
-                                            <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax>
+                                            <cfset price = variables.productDetails.fldPrice + variables.productDetails.fldTax*variables.productDetails.fldPrice/100>
                                             #price#
                                         </div>
                                     </a>
                                 </div>
                             </cfif>
-                        </cfloop>
-                        <cfif productsPresent EQ 0>
-                            NO PRODUCTS PRESENT
                         </cfif>
-                    </div>
-                </cfloop>
-        </div>
-
-    </cfoutput>
+                    </cfoutput>
+                    <cfif productsPresent EQ 0>
+                        NO PRODUCTS PRESENT
+                    </cfif>
+                </div>
+            </cfoutput>
+    </div>
 
 <cfinclude  template="./userFooter.cfm">

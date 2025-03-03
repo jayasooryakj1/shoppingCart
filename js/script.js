@@ -54,11 +54,13 @@ function filter(subCategoryId) {
     })
 }
 
-function showMore(excludedProductIds, subCategoryId,sort){
+function showMore(subCategoryId,sort){
+    let excludedProductIds = document.getElementById("excludedProductIds").value;
+    let totalProductCount = document.getElementById("totalProductCount").value;
     $.ajax({
         type:"post",
         url:"components/user.cfc?method=getProducts",
-        data:{excludedProductIds:excludedProductIds,subCategoryId:subCategoryId,sort:sort},
+        data:{excludedProductIds:excludedProductIds,subCategoryId:subCategoryId,sort:sort,limit:6},
         success:function (result) {
             var filterQuery = JSON.parse(result);
                 let productItem 
@@ -72,13 +74,16 @@ function showMore(excludedProductIds, subCategoryId,sort){
                                                 ${element[3]}
                                             </div>
                                             <div> 
-                                                ${element[7] + element[7]}
+                                                ${element[7] + element[8]*element[7]/100}
                                             </div>
                                         </a>
                                     </div>`
+                    document.getElementById("excludedProductIds").value=document.getElementById("excludedProductIds").value+','+element[0];
                     $("#parentDiv").append(productItem)
                 });
-            $("#showMore").remove();
+            if (totalProductCount==document.getElementById("excludedProductIds").value.split(',').length) {
+                $("#showMore").remove();
+            }
         }
     })
 }
@@ -106,7 +111,8 @@ function clearFilter() {
     $("#max").val("");
 }
 
-function updateQuantity(updateType, cartId, unitPrice) {
+function updateQuantity(updateType, cartId) {
+    unitPrice = Number(document.getElementById("total"+cartId).innerHTML)/document.getElementById("cartQuantity"+cartId).innerHTML;
     $.ajax({
         type:"post",
         url:"components/user.cfc?method=updateCart",

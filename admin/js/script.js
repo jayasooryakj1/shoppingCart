@@ -50,9 +50,10 @@ function autoPopulateCategory(editCategoryId) {
     document.getElementById("categoryIdField").value=editCategoryId.value;
     $.ajax({
         type:"POST",
-        url:"./Components/adminComponent.cfc?method=autoPopulateCategory",
-        data:{editCategoryId:editCategoryId.value},
+        url:"./components/adminComponent.cfc?method=dipslayCategories",
+        data:{categoryId:editCategoryId.value},
         success: function(result) {
+            console.log(result)
             document.getElementById("categoryNameField").value=result;
         }
     });
