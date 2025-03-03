@@ -112,7 +112,7 @@
                                     #variables.subCategoryProducts.fldProductName#
                                 </div>
                                 <div>
-                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax>
+                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax*variables.subCategoryProducts.fldPrice/100>
                                     #price#
                                 </div>
                             </a>
@@ -130,7 +130,7 @@
                                     #variables.subCategoryProducts.fldProductName#
                                 </div>
                                 <div>
-                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax>
+                                    <cfset price = variables.subCategoryProducts.fldPrice + variables.subCategoryProducts.fldTax*variables.subCategoryProducts.fldPrice/100>
                                     #price#
                                 </div>
                             </a>
@@ -147,14 +147,16 @@
         <cfelse>
             <cfset variables.subCategoryId = 0>
         </cfif>
+        <input type="hidden" value="#arraytoList(excludedProductIds)#" id="excludedProductIds">
+        <input type="hidden" value="#variables.productCount.count#" id="totalProductCount">
         <cfif variables.productCount.count GT 6 AND NOT structKeyExists(url, "search")>
             <div class="d-flex align-items-center justify-content-center">
                 <div>
                     <button id="showMore" class="btn btn-outline-primary p-1" 
-                        onclick="showMore('#arraytoList(excludedProductIds)#',
+                        onclick="showMore(
                             #variables.subCategoryId#
-                            <cfif structKeyExists(form, "ascending")>,'ASC'</cfif>
-                            <cfif structKeyExists(form, "descending")>,'DESC'</cfif>
+                            <cfif structKeyExists(url, "ascending")>,'ASC'</cfif>
+                            <cfif structKeyExists(url, "descending")>,'DESC'</cfif>
                         )">SHOW MORE
                     </button>
                 </div>

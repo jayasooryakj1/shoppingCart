@@ -1,6 +1,6 @@
-<cfset variables.productImages = application.userObject.getProductImages(
+<!---<cfset variables.productImages = application.userObject.getProductImages(
     productId = url.productId
-)>
+)>--->
 
 <cfset productDetails = application.userObject.getProducts(
     productId = url.productId
@@ -13,13 +13,13 @@
             <div>
                 <div id="carouselExampleControls" class="carousel d-flex align-items-center justify-content-center slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        <cfloop query="#variables.productImages#">
-                            <cfif variables.productImages.fldDefaultImage EQ 1>
+                        <cfloop list="#variables.productDetails.images#" item="item" index="index">
+                            <cfif index EQ 1>
                                 <div class="carousel-item active">
                             <cfelse>
                                 <div class="carousel-item">
                             </cfif>
-                                    <img src="assets/productImages/#variables.productImages.fldImageFileName#" class="d-block w-75" alt="productImage">
+                                    <img src="assets/productImages/#item#" class="d-block w-75" alt="productImage">
                                 </div>
                         </cfloop>
                     </div>
@@ -51,7 +51,7 @@
                     <h6>#productDetails.fldBrandName#</h6>
                 </div>
                 <div>
-                    <cfset price = productDetails.fldPrice + productDetails.fldTax>
+                    <cfset price = variables.productDetails.fldPrice + variables.productDetails.fldTax*variables.productDetails.fldPrice/100>
                     <h4><i class="fa-solid fa-indian-rupee-sign"></i> #price#</h4>
                 </div>
                 <div>

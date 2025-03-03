@@ -4,6 +4,7 @@
         orderId = url.orderId
     )>
 
+    <cfset variables.totalPrice = 0>
     <cfset local.fileName = dateTimeFormat(now(),"dd-mm-yyyy-hh-nn-ss")>
     <cfoutput>
         <cfheader name="content-disposition" value="attachment;filename=#url.orderId#(#local.fileName#).pdf">
@@ -30,14 +31,15 @@
                     <th>Total Price</th>
                 </tr>
                 <cfloop query="variables.orderDetails">
+                    <cfset variables.totalPrice = variables.totalPrice + (variables.orderDetails.unitPrice+(variables.orderDetails.unitPrice*variables.orderDetails.unitTax/100))*variables.orderDetails.quantity>
                     <tr>
                         <td>#variables.orderDetails.currentRow#</td>
                         <td>#variables.orderDetails.productName#</td>
                         <td>#variables.orderDetails.brandName#</td>
                         <td>#variables.orderDetails.unitPrice#</td>
-                        <td>#variables.orderDetails.unitTax#</td>
+                        <td>#variables.orderDetails.unitPrice*variables.orderDetails.unitTax/100#</td>
                         <td>#variables.orderDetails.quantity#</td>
-                        <td>#(variables.orderDetails.unitPrice+variables.orderDetails.unitTax)*variables.orderDetails.quantity#</td>
+                        <td>#(variables.orderDetails.unitPrice+(variables.orderDetails.unitPrice*variables.orderDetails.unitTax/100))*variables.orderDetails.quantity#</td>
                     </tr>
                 </cfloop>
                 <tr>
@@ -45,7 +47,7 @@
                         Total Price
                     </td>
                     <td colspan="4" align="right">
-                        #variables.orderDetails.totalPrice+variables.orderDetails.totalTax#
+                        #variables.totalPrice#
                     </td>
                 </tr>
                 <tr>

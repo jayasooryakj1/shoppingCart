@@ -6,15 +6,6 @@
         phoneNumber = form.phoneNumber,
         password = form.password
     )>
-    <cfif structKeyExists(variables, "result") AND variables.result>
-        <div>
-            Email already Exists
-        </div>
-    <cfelse>
-        <div>
-            User added
-        </div>
-    </cfif>
 </cfif>
     
 <cfinclude  template="./userHeader.cfm">
@@ -25,29 +16,45 @@
                 <div class="p-2">
                     <h4>SIGN UP</h4>
                 </div>
+                <cfif structKeyExists(form, "submit")>
+                    <cfif structKeyExists(variables, "result") AND NOT variables.result>
+                        <div class="text-danger">
+                            Email already Exists
+                        </div>
+                    <cfelse>
+                        <div class="text-danger">
+                            User added
+                        </div>
+                    </cfif>
+                </cfif>
                 <div class="p-2 me-5">
                     First Name:
-                    <input type="text" name="firstName" required>
+                    <input type="text" id="signupFirstName" name="firstName" required>
+                    <div class="text-danger d-flex align-items-center justify-content-center" id="firstNameError"></div>
                 </div>
                 <div class="p-2 me-5">
                     Last Name:
-                    <input type="text" name="lastName" required>
+                    <input type="text" id="signupLastName" name="lastName" required>
+                    <div class="text-danger d-flex align-items-center justify-content-center" id="lastNameError"></div>
                 </div>
                 <div class="p-2 me-2">
                     Email:
-                    <input type="email" name="email" required>
+                    <input type="email" id="signupEmail" name="email" required>
+                    <div class="text-danger d-flex align-items-center justify-content-center" id="emailError"></div>
                 </div>
                 <div class="p-2 phoneInput">
                     Phone number:
-                    <input type="tel" pattern="[0-9]{10}" name="phoneNumber" required>
+                    <input type="tel" pattern="[0-9]{10}" title="Invalid phone number" id="signupPhone" name="phoneNumber" required>
+                    <div class="text-danger d-flex align-items-center justify-content-center" id="phoneError"></div>
                 </div>
                 <div class="p-2 passwordInput">
                     Password:
-                    <input type="password" name="password" minlength="8" required>
+                    <input type="password" id="signupPassword" name="password" minlength="8" required>
+                    <div class="text-danger d-flex align-items-center justify-content-center" id="passwordError"></div>
                 </div>
                 <br>
                 <div>
-                    <button type="submit" name="submit" class="btn btn-success">SUBMIT</button>
+                    <button type="submit" name="submit" class="btn btn-success" onclick="return validateSignUp()">SUBMIT</button>
                 </div>
             </div>
         </form>

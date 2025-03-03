@@ -22,7 +22,7 @@
             <cfset local.hashedInputPassword = Hash(arguments.adminPassword & local.check.fldUserSaltString, 'SHA-512', 'utf-8', 125)>
             <cfif local.hashedInputPassword EQ local.check.fldHashedPassword>
                 <cfset local.result = "true">
-                <cfset session.userId = local.check.fldUser_ID>
+                <cfset session.adminId = local.check.fldUser_ID>
             <cfelse>
                 <cfset local.result = "Incorrect User name or password">
             </cfif>
@@ -54,15 +54,31 @@
                 )
                 VALUES (
                     <cfqueryparam value='#arguments.categoryName#' cfsqltype="VARCHAR">,
-                    <cfqueryparam value='#session.userId#' cfsqltype="VARCHAR">
+                    <cfqueryparam value='#session.adminId#' cfsqltype="VARCHAR">
                 )
             </cfquery>
         </cfif>
         <cfreturn local.categoryExistence>
     </cffunction>
 
+
+    <cffunction  name="autoPopulateCategoryModalDropDown">
+        <cfquery name="local.autoPopulateCategory" returntype="query">
+            SELECT
+                fldCategory_ID,
+                fldCategoryName
+            FROM
+                tblCategory
+            WHERE
+                fldActive= 1
+        </cfquery>
+        <cfreturn local.autoPopulateCategory>
+    </cffunction>
+
+    
     <!--- DISPLAY CATEGORIES --->
-    <cffunction  name="dipslayCategories" returntype="query">
+    <cffunction  name="dipslayCategories" returntype="any" access="remote" returnformat="plain">
+        <cfargument  name="categoryId" required="false" type="integer">
         <cfquery name="local.displayCategories">
             SELECT 
                 fldCategory_ID,
@@ -71,22 +87,14 @@
                 tblCategory
             WHERE
                 fldActive = 1
+                <cfif structKeyExists(arguments, "categoryId")>
+                    AND fldCategory_ID = <cfqueryparam value="#arguments.categoryId#" cfsqltype="NUMERIC">
+                </cfif>
         </cfquery>
+        <cfif structKeyExists(arguments, "categoryId")>
+            <cfreturn local.displayCategories.fldCategoryName>
+        </cfif>
         <cfreturn local.displayCategories>
-    </cffunction>
-
-    <!--- AUTO POPULATE CATEGORY--->
-    <cffunction  name="autoPopulateCategory" access="remote" returnformat="plain">
-        <cfargument  name="editCategoryId" required="true" type="intrger">
-        <cfquery name="local.selectCategoryName">
-            SELECT
-                fldCategoryName
-            FROM
-                tblCategory
-            WHERE
-                fldCategory_ID = <cfqueryparam value=#arguments.editCategoryId# cfsqltype="INTEGER">
-        </cfquery>
-        <cfreturn local.selectCategoryName.fldCategoryName>
     </cffunction>
 
     <!--- CHECK IF CATEGORY EXISTS --->
@@ -121,7 +129,7 @@
                     tblCategory
                 SET
                     fldCategoryName = <cfqueryparam value="#arguments.categoryName#" cfsqltype="VARCHAR">,
-                    fldUpdatedBy = <cfqueryparam value="#session.userId#" cfsqltype="VARCHAR">
+                    fldUpdatedBy = <cfqueryparam value="#session.adminId#" cfsqltype="VARCHAR">
                 WHERE
                     fldCategory_ID = <cfqueryparam value="#arguments.categoryId#" cfsqltype="INTEGER">
             </cfquery>
@@ -147,7 +155,7 @@
     <!--- SUB CATEGORY FUNCTIONS --->
 
     <!--- SUB CATEGORY DISPLAY --->
-    <cffunction  name="displaySubCategories" returntype="query">
+    <cffunction  name="displaySubCategories" returntype="query" access="remote">
         <cfargument  name="categoryId" required="true" type="integer">
         <cfquery name="local.displaySubCategories">
             SELECT 
@@ -183,20 +191,6 @@
         </cfif>
     </cffunction>
 
-    <!--- AUTO POPULATE CATEGORY IN MODAL --->
-    <cffunction  name="autoPopulateCategoryModalDropDown">
-        <cfquery name="local.autoPopulateCategory" returntype="query">
-            SELECT
-                fldCategory_ID,
-                fldCategoryName
-            FROM
-                tblCategory
-            WHERE
-                fldActive= 1
-        </cfquery>
-        <cfreturn local.autoPopulateCategory>
-    </cffunction>
-
     <!--- ADD SUB CATEGORY --->
     <cffunction  name="addSubCategory" returntype="boolean">
         <cfargument  name="categoryId" required="true" type="integer">
@@ -216,7 +210,7 @@
                 VALUES (
                     <cfqueryparam value="#arguments.categoryId#" cfsqltype="NUMERIC">,
                     <cfqueryparam value="#arguments.subCategoryName#" cfsqltype="VARCHAR">,
-                    <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                    <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
                 )
             </cfquery>
         </cfif>
@@ -239,7 +233,7 @@
                 SET
                     fldSubCategoryName = <cfqueryparam value="#arguments.subCategoryName#" cfsqltype="VARCHAR">,
                     fldcategoryId = <cfqueryparam value="#arguments.categoryId#" cfsqltype="NUMERIC">,
-                    fldUpdatedBy = <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                    fldUpdatedBy = <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
                 WHERE
                     fldSubCategory_ID = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">
             </cfquery>
@@ -254,7 +248,7 @@
             UPDATE
                 tblSubCategory
             SET
-                fldUpdatedBy = <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">,
+                fldUpdatedBy = <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">,
                 fldActive = 0
             WHERE
                 fldSubCategory_ID = <cfqueryparam value="#arguments.deleteSubCategoryId#" cfsqltype="NUMERIC">
@@ -337,31 +331,6 @@
         <cfreturn local.autoPopulateBrand>
     </cffunction>
 
-    <!--- CHECK IF PRODUCT EXISTS --->
-    <cffunction  name="checkProductExistence" returntype="boolean">
-        <cfargument  name="subCategoryId" required="true" type="integer">
-        <cfargument  name="productName" required="true" type="string">
-        <cfargument  name="productId" type="integer">
-        <cfquery name="local.productExistence">
-            SELECT
-                fldProductName
-            FROM
-                tblProduct
-            WHERE
-                fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">
-                AND fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">
-                AND fldActive = 1
-                <cfif structKeyExists(arguments, "productId")>
-                    AND NOT fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
-                </cfif>
-        </cfquery>
-        <cfif queryRecordCount(local.productExistence)>
-            <cfreturn true>
-        <cfelse>
-            <cfreturn false>
-        </cfif>
-    </cffunction>
-
     <!--- ADD PRODUCT --->
     <cffunction  name="addProduct" returntype="boolean">
         <cfargument  name="subCategoryId" required="true" type="integer">
@@ -370,58 +339,52 @@
         <cfargument  name="productDescription" required="true" type="string">
         <cfargument  name="productPrice" required="true" type="float">
         <cfargument  name="productTax" required="true" type="float">
-        <cfset local.productExistence = checkProductExistence(
-            subCategoryId = arguments.subCategoryId,
-            productName = arguments.productName
-        )>
-        <cfif NOT local.productExistence>
-            <cffile  action="uploadall"
-                destination=#expandPath("../assets/productImages")#
-                result="local.uploadedFiles"
-                nameconflict="makeunique"
-            >
-            <cfquery result="local.addProduct">
+        <cffile  action="uploadall"
+            destination=#expandPath("../assets/productImages")#
+            result="local.uploadedFiles"
+            nameconflict="makeunique"
+        >
+        <cfquery result="local.addProduct">
+            INSERT INTO
+                tblProduct (
+                    fldSubCategoryId,
+                    fldProductName,
+                    fldBrandId,
+                    fldDescription,
+                    fldPrice,
+                    fldTax,
+                    fldCreatedBy
+                )
+            VALUES (
+                <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
+                <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
+                <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
+                <cfqueryparam value="#arguments.productDescription#" cfsqltype="VARCHAR">,
+                <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
+                <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">,
+                <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
+            )
+        </cfquery>
+        <cfset local.defaultImage = 1>
+        <cfloop array="#local.uploadedFiles#" item="item">
+            <cfquery name="local.insertImages">
                 INSERT INTO
-                    tblProduct (
-                        fldSubCategoryId,
-                        fldProductName,
-                        fldBrandId,
-                        fldDescription,
-                        fldPrice,
-                        fldTax,
+                    tblProductImages (
+                        fldProductId,
+                        fldImageFileName,
+                        fldDefaultImage,
                         fldCreatedBy
                     )
                 VALUES (
-                    <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
-                    <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
-                    <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
-                    <cfqueryparam value="#arguments.productDescription#" cfsqltype="VARCHAR">,
-                    <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
-                    <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">,
-                    <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                    <cfqueryparam value="#local.addProduct.generatedKey#" cfsqltype="NUMERIC">,
+                    <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
+                    <cfqueryparam value="#local.defaultImage#" cfsqltype="NUMERIC">,
+                    <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
                 )
             </cfquery>
-            <cfset local.defaultImage = 1>
-            <cfloop array="#local.uploadedFiles#" item="item">
-                <cfquery name="local.insertImages">
-                    INSERT INTO
-                        tblProductImages (
-                            fldProductId,
-                            fldImageFileName,
-                            fldDefaultImage,
-                            fldCreatedBy
-                        )
-                    VALUES (
-                        <cfqueryparam value="#local.addProduct.generatedKey#" cfsqltype="NUMERIC">,
-                        <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
-                        <cfqueryparam value="#local.defaultImage#" cfsqltype="NUMERIC">,
-                        <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
-                    )
-                </cfquery>
-                <cfset local.defaultImage = 0>
-            </cfloop>
-        </cfif>
-        <cfreturn local.productExistence>
+            <cfset local.defaultImage = 0>
+        </cfloop>
+            <cfreturn true>
     </cffunction>
 
     <!--- DELETE PRODUCT --->
@@ -432,7 +395,7 @@
                 tblProduct
             SET
                 fldActive = 0,
-                fldUpdatedBy = <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+                fldUpdatedBy = <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
             WHERE
                 fldProduct_ID = <cfqueryparam value="#arguments.deleteProductId#" cfsqltype="NUMERIC">
         </cfquery>
@@ -440,7 +403,7 @@
     </cffunction>
 
     <!--- EDIT PRODUCT --->
-    <cffunction  name="editProduct">
+    <cffunction  name="editProduct" returntype="boolean">
         <cfargument  name="subCategoryId" required="true" type="integer">
         <cfargument  name="productName" required="true" type="string">
         <cfargument  name="brandId" required="true" type="integer">
@@ -448,49 +411,42 @@
         <cfargument  name="productPrice" required="true" type="float">
         <cfargument  name="productTax" required="true" type="float">
         <cfargument  name="productId" required="true" type="integer">
-        <cfset local.productExistence = checkProductExistence(
-            subCategoryId = arguments.subCategoryId,
-            productName = arguments.productName,
-            productId = arguments.productId
-        )>
-        <cfif NOT local.productExistence>
-            <cfquery name="local.editProduct">
-                UPDATE
-                    tblProduct
-                SET
-                    fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
-                    fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
-                    fldBrandId = <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
-                    fldDescription = <cfqueryparam value="#arguments.productdescription#" cfsqltype="VARCHAR">,
-                    fldPrice = <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
-                    fldTax = <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">
-                WHERE
-                    fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
-            </cfquery>
-            <cffile  action="uploadall"
-                destination=#expandPath("../assets/productImages")#
-                result="local.uploadedFiles"
-                nameconflict="makeunique"
-            >
-            <cfloop array="#local.uploadedFiles#" item="item">
-                <cfquery name="local.insertNewImages">
-                    INSERT INTO
-                        tblProductImages (
-                            fldProductId,
-                            fldImageFileName,
-                            fldDefaultImage,
-                            fldCreatedBy
-                        )
-                    VALUES (
-                        <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">,
-                        <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
-                        0,
-                        <cfqueryparam value="#session.userId#" cfsqltype="NUMERIC">
+        <cfquery name="local.editProduct">
+            UPDATE
+                tblProduct
+            SET
+                fldSubCategoryId = <cfqueryparam value="#arguments.subCategoryId#" cfsqltype="NUMERIC">,
+                fldProductName = <cfqueryparam value="#arguments.productName#" cfsqltype="VARCHAR">,
+                fldBrandId = <cfqueryparam value="#arguments.brandId#" cfsqltype="NUMERIC">,
+                fldDescription = <cfqueryparam value="#arguments.productdescription#" cfsqltype="VARCHAR">,
+                fldPrice = <cfqueryparam value="#arguments.productPrice#" cfsqltype="DECIMAL" scale="2">,
+                fldTax = <cfqueryparam value="#arguments.productTax#" cfsqltype="DECIMAL" scale="2">
+            WHERE
+                fldProduct_ID = <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">
+        </cfquery>
+        <cffile  action="uploadall"
+            destination=#expandPath("../assets/productImages")#
+            result="local.uploadedFiles"
+            nameconflict="makeunique"
+        >
+        <cfloop array="#local.uploadedFiles#" item="item">
+            <cfquery name="local.insertNewImages">
+                INSERT INTO
+                    tblProductImages (
+                        fldProductId,
+                        fldImageFileName,
+                        fldDefaultImage,
+                        fldCreatedBy
                     )
-                </cfquery>
-            </cfloop>
-        </cfif>
-        <cfreturn local.productExistence>
+                VALUES (
+                    <cfqueryparam value="#arguments.productId#" cfsqltype="NUMERIC">,
+                    <cfqueryparam value="#item.serverfile#" cfsqltype="VARCHAR">,
+                    0,
+                    <cfqueryparam value="#session.adminId#" cfsqltype="NUMERIC">
+                )
+            </cfquery>
+        </cfloop>
+        <cfreturn true>
     </cffunction>
 
     <!--- SELECT IMAGE USING PRODUCT ID --->
